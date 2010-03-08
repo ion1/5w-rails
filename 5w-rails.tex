@@ -1,0 +1,219 @@
+\documentclass{article}
+\usepackage[english,finnish]{babel}
+\usepackage[utf8]{inputenc}
+
+\usepackage[a4paper,margin=2cm]{geometry}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{xcolor}
+
+\usepackage{texments}
+\usestyle{default}
+
+\renewcommand{\familydefault}{\sfdefault}
+\setlength{\parskip}{\medskipamount}
+\setlength{\parindent}{0pt}
+
+\newcommand{\myfigure}[3]{
+  \begin{figure}
+    \centering
+    \fcolorbox{blue}{blue!1}{
+      \begin{minipage}{0.8\textwidth}
+        #3
+        \caption{#2}
+        \label{#1}
+      \end{minipage}
+    }
+  \end{figure}
+}
+
+\newcommand{\en}[1]{\foreignlanguage{english}{#1}}
+
+\title{\en{5w.fi Ruby on Rails workshop}}
+\author{Johan Kiviniemi}
+
+\begin{document}
+\maketitle
+
+Jotain dokumentaationtynkää 5w:n\footnote{\url{http://5w.fi/}}, Tampereen
+hackerspacen, Rails-opiskeluprojektista.
+
+\section{Sessio 2010-03-01}
+
+\subsection{Railsin asentaminen}
+
+\begin{samepage}
+  Tarkoituksena on käyttää Railsin versiota
+  3\footnote{\url{http://guides.rails.info/3\_0\_release\_notes.html}}, joka on
+  vielä beta-vaiheessa. Asenna ensin uusin RubyGems-versio omaan
+  kotihakemistoosi. Kirjoitushetkellä Debianissa ja Ubuntussa oleva
+  RubyGems-versio on liian vanha.
+
+  \includecode{include/000-install-rubygems.sh}
+\end{samepage}
+
+Lisää myös nuo kolme export-riviä shellisi käynnistystiedostoon (esim.
+\textasciitilde/.bashrc tai \textasciitilde/.zshrc), jotta RubyGems-asennus
+toimii jatkossakin käynnistämissäsi shelleissä.
+
+\begin{samepage}
+  Seuraavaksi asenna Rails 3.
+
+  \includecode{include/001-install-rails.sh}
+\end{samepage}
+
+\subsection{Uuden projektin luominen}
+
+\begin{samepage}
+  Seuraavat komennot luovat \textasciitilde/src-hakemiston alle
+  t5w.fi-hakemiston, joka sisältää tyhjän Rails-projektin puun.
+
+  Tulemme käyttämään RSpec-kirjastoa yksikkötestaukseen TestUnitin sijaan, ja
+  jQuery-JavaScript-kirjastoa Prototypen sijaan. Lisää niistä myöhemmin.
+
+  \includecode{include/002-create-project.sh}
+\end{samepage}
+
+Luomassamme projektissa on tiedosto \en{config/database.yml}, joka sisältää
+asetukset tietokantaan yhdistämiseen. Emme halua sen päätyvän
+versionhallintaan, koska tietokanta-asetukset tulevat olemaan mm.
+kehitysympäristössä erilaiset kuin tuotantopalvelimella.
+
+\begin{samepage}
+  Kopioi \en{config/database.yml} tiedostoon \en{config/database.yml.example},
+  ja varmista, että vain jälkimmäinen päätyy versionhallintaan.
+
+  \includecode{include/003-database-config.sh}
+\end{samepage}
+
+\subsection{Versionhallinnan alustaminen}
+
+Jos olet käyttämässä Git-versionhallintaa ensimmäistä kertaa, katso
+\hyperref[fig:git-initial-config]{kuva \ref*{fig:git-initial-config}}.
+
+\myfigure{fig:git-initial-config}{
+  Perusasetuksien teko ensimmäisellä Git-käyttökerralla
+}{
+  \includecode{include/004-git-initial-config.sh}
+}
+
+\begin{samepage}
+  Alusta Git nykyiseen hakemistoon, lisää sisältö seuraavaa committia varten ja
+  luo ensimmäinen commit.
+
+  \includecode{include/005-git-initial-import.sh}
+\end{samepage}
+
+\subsection{Testaus}
+
+Testaaminen on oleellinen osa sovelluskehitystä. Jos jättäisimme testaamisen
+väliin, meillä ei olisi mitään takeita siitä, että kukin tuotantoon asentamamme
+ohjelmapäivitys toimii täysin oikein.
+
+Pieniä ja isompia bugeja livahtaa koodiin aina, ja hyvin tehty
+testisarja\footnote{Engl. \en{test suite}} löytää ne nopeasti.
+
+Käytän tässä dokumentissa termiä integraatiotestaus\footnote{Engl.
+\en{integration testing}} sovelluksen käyttäjälle näkyvän toiminnallisuuden
+kokonaisvaltaisesta testaamisesta, ja termiä yksikkötestaus\footnote{Engl.
+\en{unit testing}} sovelluksen sisäisten rajapintojen testaamisesta.
+
+Testit on mahdollista kirjoittaa ennen tai jälkeen varsinaisen toteutuksen
+ohjelmoimista. Testien kirjoittamisesta etukäteen on joitakin
+etuja\footnote{\en{Test Driven Development; Behavior Driven Development;
+\url{http://en.wikipedia.org/wiki/Test-driven\_development##Benefits}}}:
+
+\begin{itemize}
+  \item
+  Testisarjasta saadaan varmemmin kattava, mikäli pitäydytään toimintatavassa,
+  jossa ei kirjoiteta implementaatiokoodia ennen testien olemassaoloa.
+
+  \item
+  Tämä toimintatapa toimii apuvälineenä tulevan toteutuksen rajapinnan tai
+  käyttöliittymän suunnittelussa. Testejä luodessa kirjoitetaan koodia, joka
+  käyttää kuvitteellista, mahdollisimman miellyttävää rajapintaa.
+
+  Toteutusta tehdessä optimaalinen rajapinta tai käyttöliittymän toimintatapa
+  on näin jo hahmottunut.
+
+  \item
+  Testisarja kertoo kunkin speksatun asian suhteen, mistä aloittaa, mitä tehdä
+  seuraavaksi ja milloin speksi on implementoitu.
+\end{itemize}
+
+\subsection{Testauskirjastojen asennus}
+
+Käytämme RSpec\footnote{\url{http://rspec.info/}}-kirjastoa yksikkötestaukseen
+ja Cucumber\footnote{\url{http://cukes.info/}}-kirjastoa
+integraatiotestaukseen.
+
+\begin{samepage}
+  Avaa Gemfile\footnote{Gemfile listaa sovelluksen
+  RubyGems-riippuvuudet.}-tiedosto editoriin ja lisää siihen seuraavat rivit:
+
+  \includecode{include/006-gemfile-cucumber.rb}
+\end{samepage}
+
+\begin{samepage}
+  Aja seuraavat komennot, jotta kyseiset gemit asentuvat.
+
+  \includecode{include/007-bundle-install-cucumber.sh}
+\end{samepage}
+
+\begin{samepage}
+  Lisää projektiin Cucumberin runko, jotta testaus Cucumberilla onnistuu.
+
+  \includecode{include/008-cucumber-skeleton.sh}
+\end{samepage}
+
+% Why doesn’t this work?
+%\subsection{Ensimmäinen integraatiotesti: \en{Manage projects}}
+\subsection{Ensimmäinen integraatiotesti: Manage projects}
+
+Luo editorissa tiedosto \en{features/manage\_projects.feature}
+(\hyperref[fig:manage-projects-feature]{kuva
+\ref*{fig:manage-projects-feature}}).
+
+\myfigure{fig:manage-projects-feature}{\en{features/manage\_projects.feature}}{
+  \includecode{include/009-manage_projects.feature}
+}
+
+Esimerkin alussa oleva {\em @wip} ({\em ''\en{work in progress}''}) on tagi,
+jonka perusteella voidaan rajata työn alla olevat speksit ajettavaksi kerralla.
+
+\en{Feature}-lohko alussa noudattaa tiettyä
+formaattia\footnote{\url{http://wiki.github.com/aslakhellesoy/cucumber/gherkin}},
+mutta on pelkkää dokumentaatiota. Varsinaiset ajettavat testit ovat
+\en{Scenario}-lohkoissa.
+
+Ensimmäinen skenaario testaa projektin onnistuneen lisäyksen käyttäjän
+näkökulmasta.
+
+Seuraava skenaario (huom. {\em ''\en{Scenario {\bf Outline}}''}) suoritetaan
+sen sisältämän \en{Examples}-taulukon mukaisesti neljä kertaa, täydentäen
+kulmasulkeiden sisältämien kenttien tilalle arvot taulukosta. Kyseinen
+skenaario varmistaa virheenkäsittelyn toiminnan jättäen kullakin kerralla yhden
+kentistä tyhjäksi (täyttäen muut validilla arvolla {\em ''x''}).
+
+Viimeinen skenaario on samankaltainen ensimmäisen kanssa, mutta se varmistaa,
+että lisätty projekti ilmestyy myös projektilistaan.
+
+Risuaidalla alkavat rivit ovat kommentteja: \en{Who}-kenttien testaus
+toteutetaan myöhemmin, kun sovellukseen lisätään tuki käyttäjätunnuksille.
+
+Cucumber-Railsin mukana tulee ohjelmakoodia, jonka perusteella \en{Cucumber}
+tietää, mitä tehdä, kun speksissä lukee esim. {\em ''\en{When I press ...}''}
+tai {\em ''\en{Then I should see ...}''}.
+
+Tämän speksin ainoa testi, jonka toteuttavan koodin joudumme toteuttamaan itse,
+on {\em ''\en{Then I should see a timestamp no older/newer than ...}''}. Se
+demonstroidaan seuraavalla kerralla.
+
+\begin{samepage}
+  Tee myös tästä muutoksesta commit.
+
+  \includecode{include/010-git-add-features.sh}
+\end{samepage}
+
+\end{document}
+
+% vim:set et sw=2 sts=2:
