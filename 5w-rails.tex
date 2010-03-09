@@ -48,9 +48,17 @@ hackerspacen, Rails-opiskeluprojektista.
 \begin{samepage}
 Tarkoituksena on käyttää Railsin
 versiota~3\footnote{\url{http://guides.rails.info/3\_0\_release\_notes.html}},
-joka on vielä beta-vaiheessa. Asenna ensin uusin RubyGems-versio omaan
-kotihakemistoosi. Kirjoitushetkellä Debianissa ja Ubuntussa oleva
-RubyGems-versio on liian vanha.
+joka on vielä beta-vaiheessa.
+
+Asenna ensin Ruby~1.9.1 järjestelmään. Debianissa ja Ubuntussa tarvittavat
+paketit tulevat ri1.9.1-paketin riippuvuuksina.
+
+\begin{pygmented}{sh}
+sudo apt-get install ri1.9.1
+\end{pygmented}
+
+Asenna uusin RubyGems-versio omaan kotihakemistoosi. Kirjoitushetkellä
+Debianissa ja Ubuntussa oleva RubyGems-versio on liian vanha.
 
 \begin{pygmented}{sh}
 mkdir -p /tmp/src/rubygems
