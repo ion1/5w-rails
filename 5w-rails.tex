@@ -35,8 +35,8 @@
 \maketitle
 
 \begin{abstract}
-  Jotain dokumentaationtynkää 5w:n\footnote{\url{http://5w.fi/}}, Tampereen
-  hackerspacen, Rails-opiskeluprojektista.
+Jotain dokumentaationtynkää 5w:n\footnote{\url{http://5w.fi/}}, Tampereen
+hackerspacen, Rails-opiskeluprojektista.
 \end{abstract}
 
 \tableofcontents
@@ -46,13 +46,13 @@
 \subsection{Railsin asentaminen}
 
 \begin{samepage}
-  Tarkoituksena on käyttää Railsin versiota
-  3\footnote{\url{http://guides.rails.info/3\_0\_release\_notes.html}}, joka on
-  vielä beta-vaiheessa. Asenna ensin uusin RubyGems-versio omaan
-  kotihakemistoosi. Kirjoitushetkellä Debianissa ja Ubuntussa oleva
-  RubyGems-versio on liian vanha.
+Tarkoituksena on käyttää Railsin versiota
+3\footnote{\url{http://guides.rails.info/3\_0\_release\_notes.html}}, joka on
+vielä beta-vaiheessa. Asenna ensin uusin RubyGems-versio omaan
+kotihakemistoosi. Kirjoitushetkellä Debianissa ja Ubuntussa oleva
+RubyGems-versio on liian vanha.
 
-  \includecode{include/000-install-rubygems.sh}
+\includecode{include/000-install-rubygems.sh}
 \end{samepage}
 
 Lisää myös nuo kolme export-riviä shellisi käynnistystiedostoon (esim.
@@ -60,21 +60,21 @@ Lisää myös nuo kolme export-riviä shellisi käynnistystiedostoon (esim.
 toimii jatkossakin käynnistämissäsi shelleissä.
 
 \begin{samepage}
-  Seuraavaksi asenna Rails 3.
+Seuraavaksi asenna Rails 3.
 
-  \includecode{include/001-install-rails.sh}
+\includecode{include/001-install-rails.sh}
 \end{samepage}
 
 \subsection{Uuden projektin luominen}
 
 \begin{samepage}
-  Seuraavat komennot luovat \textasciitilde/src-hakemiston alle
-  t5w.fi-hakemiston, joka sisältää tyhjän Rails-projektin puun.
+Seuraavat komennot luovat \textasciitilde/src-hakemiston alle
+t5w.fi-hakemiston, joka sisältää tyhjän Rails-projektin puun.
 
-  Tulemme käyttämään RSpec-kirjastoa yksikkötestaukseen TestUnitin sijaan, ja
-  jQuery-JavaScript-kirjastoa Prototypen sijaan. Lisää niistä myöhemmin.
+Tulemme käyttämään RSpec-kirjastoa yksikkötestaukseen TestUnitin sijaan, ja
+jQuery-JavaScript-kirjastoa Prototypen sijaan. Lisää niistä myöhemmin.
 
-  \includecode{include/002-create-project.sh}
+\includecode{include/002-create-project.sh}
 \end{samepage}
 
 Luomassamme projektissa on tiedosto \en{config/database.yml}, joka sisältää
@@ -83,10 +83,10 @@ versionhallintaan, koska tietokanta-asetukset tulevat olemaan mm.
 kehitysympäristössä erilaiset kuin tuotantopalvelimella.
 
 \begin{samepage}
-  Kopioi \en{config/database.yml} tiedostoon \en{config/database.yml.example},
-  ja varmista, että vain jälkimmäinen päätyy versionhallintaan.
+Kopioi \en{config/database.yml} tiedostoon \en{config/database.yml.example}, ja
+varmista, että vain jälkimmäinen päätyy versionhallintaan.
 
-  \includecode{include/003-database-config.sh}
+\includecode{include/003-database-config.sh}
 \end{samepage}
 
 \subsection{Versionhallinnan alustaminen}
@@ -95,16 +95,16 @@ Jos olet käyttämässä Git-versionhallintaa ensimmäistä kertaa, katso
 \hyperref[fig:git-initial-config]{kuva \ref*{fig:git-initial-config}}.
 
 \myfigure{fig:git-initial-config}{
-  Perusasetuksien teko ensimmäisellä Git-käyttökerralla
+Perusasetuksien teko ensimmäisellä Git-käyttökerralla
 }{
-  \includecode{include/004-git-initial-config.sh}
+\includecode{include/004-git-initial-config.sh}
 }
 
 \begin{samepage}
-  Alusta Git nykyiseen hakemistoon, lisää sisältö seuraavaa committia varten ja
-  luo ensimmäinen commit.
+Alusta Git nykyiseen hakemistoon, lisää sisältö seuraavaa committia varten ja
+luo ensimmäinen commit.
 
-  \includecode{include/005-git-initial-import.sh}
+\includecode{include/005-git-initial-import.sh}
 \end{samepage}
 
 \subsection{Testaus}
@@ -127,25 +127,25 @@ etuja\footnote{\en{Test Driven Development; Behavior Driven Development;
 \url{http://en.wikipedia.org/wiki/Test-driven\_development##Benefits}}}:
 
 \begin{itemize}
-  \item
-  Testisarjasta saadaan varmemmin kattava, mikäli pitäydytään toimintatavassa,
-  jossa ei kirjoiteta implementaatiokoodia ennen testien olemassaoloa.
+\item
+Testisarjasta saadaan varmemmin kattava, mikäli pitäydytään toimintatavassa,
+jossa ei kirjoiteta implementaatiokoodia ennen testien olemassaoloa.
 
-  \item
-  Tämä toimintatapa toimii apuvälineenä tulevan toteutuksen rajapinnan tai
-  käyttöliittymän suunnittelussa. Testejä luodessa kirjoitetaan koodia, joka
-  käyttää kuvitteellista, mahdollisimman miellyttävää rajapintaa.
+\item
+Tämä toimintatapa toimii apuvälineenä tulevan toteutuksen rajapinnan tai
+käyttöliittymän suunnittelussa. Testejä luodessa kirjoitetaan koodia, joka
+käyttää kuvitteellista, mahdollisimman miellyttävää rajapintaa.
 
-  Toteutusta tehdessä optimaalinen rajapinta tai käyttöliittymän toimintatapa
-  on näin jo hahmottunut.
+Toteutusta tehdessä optimaalinen rajapinta tai käyttöliittymän toimintatapa on
+näin jo hahmottunut.
 
-  \item
-  Hyvin tehdyt testit toimivat käytännön esimerkkeinä rajapintojen käytöstä,
-  täydentäen dokumentaatiota.
+\item
+Hyvin tehdyt testit toimivat käytännön esimerkkeinä rajapintojen käytöstä,
+täydentäen dokumentaatiota.
 
-  \item
-  Testisarja kertoo kunkin speksatun asian suhteen, mistä aloittaa, mitä tehdä
-  seuraavaksi ja milloin speksi on implementoitu.
+\item
+Testisarja kertoo kunkin speksatun asian suhteen, mistä aloittaa, mitä tehdä
+seuraavaksi ja milloin speksi on implementoitu.
 \end{itemize}
 
 \subsection{Testauskirjastojen asennus}
@@ -155,22 +155,22 @@ ja Cucumber\footnote{\url{http://cukes.info/}}-kirjastoa
 integraatiotestaukseen.
 
 \begin{samepage}
-  Avaa Gemfile\footnote{Gemfile listaa sovelluksen
-  RubyGems-riippuvuudet.}-tiedosto editoriin ja lisää siihen seuraavat rivit:
+Avaa Gemfile\footnote{Gemfile listaa sovelluksen
+RubyGems-riippuvuudet.}-tiedosto editoriin ja lisää siihen seuraavat rivit:
 
-  \includecode{include/006-gemfile-cucumber.rb}
+\includecode{include/006-gemfile-cucumber.rb}
 \end{samepage}
 
 \begin{samepage}
-  Aja seuraavat komennot, jotta kyseiset gemit asentuvat.
+Aja seuraavat komennot, jotta kyseiset gemit asentuvat.
 
-  \includecode{include/007-bundle-install-cucumber.sh}
+\includecode{include/007-bundle-install-cucumber.sh}
 \end{samepage}
 
 \begin{samepage}
-  Lisää projektiin Cucumberin runko, jotta testaus Cucumberilla onnistuu.
+Lisää projektiin Cucumberin runko, jotta testaus Cucumberilla onnistuu.
 
-  \includecode{include/008-cucumber-skeleton.sh}
+\includecode{include/008-cucumber-skeleton.sh}
 \end{samepage}
 
 % Why doesn’t this work?
@@ -182,7 +182,7 @@ Luo editorissa tiedosto \en{features/manage\_projects.feature}
 \ref*{fig:manage-projects-feature}}).
 
 \myfigure{fig:manage-projects-feature}{\en{features/manage\_projects.feature}}{
-  \includecode{include/009-manage_projects.feature}
+\includecode{include/009-manage_projects.feature}
 }
 
 Esimerkin alussa oleva {\em @wip} ({\em ''\en{work in progress}''}) on tagi,
@@ -217,9 +217,9 @@ on {\em ''\en{Then I should see a timestamp no older/newer than ...}''}. Se
 demonstroidaan seuraavalla kerralla.
 
 \begin{samepage}
-  Tee myös tästä muutoksesta commit.
+Tee myös tästä muutoksesta commit.
 
-  \includecode{include/010-git-add-features.sh}
+\includecode{include/010-git-add-features.sh}
 \end{samepage}
 
 \end{document}
