@@ -224,16 +224,18 @@ bundle install
 \end{samepage}
 
 \begin{samepage}
-Lisää projektiin Cucumberin runko, jotta testaus Cucumberilla onnistuu.
+Asenna RSpecin ja Cucumberin projektikohtaiset tiedostot, jotta testaus niillä
+onnistuu jatkossa.
 
 \begin{pygmented}{sh}
+script/rails generate rspec:install
 script/rails generate cucumber:skeleton
 
-# The command modified config/database.yml, update example
+# config/database.yml was modified, update example
 cp config/database.yml{,.example}
 
 git add .
-git commit -m 'Add cucumber skeleton'
+git commit -m 'Add RSpec and Cucumber'
 \end{pygmented}
 \end{samepage}
 
