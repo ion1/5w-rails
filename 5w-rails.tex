@@ -130,6 +130,21 @@ echo config/database.yml >>.gitignore
 \end{pygmented}
 \end{samepage}
 
+Rails ylläpitää tiedostossa db/schema.rb kuvausta tietokannan skeemasta.
+Sovelluksen päivityksen yhteydessä Railsin migrations-toiminto hoitaa olemassa
+olevan tietokannan päivittämisen uuden koodin kanssa yhteensopivaksi, mutta
+uudet tietokannat alustetaan suoraan kyseisen tiedoston perusteella.
+
+\begin{samepage}
+Jotta db/schema.rb:n lisääminen versionhallintaan ei pääse myöhemmin
+unohtumaan, luodaan sen ensimmäinen (tyhjä) versio heti seuraavaa committia
+varten Rake-komennolla {\tt db:migrate}.
+
+\begin{pygmented}{sh}
+rake db:migrate
+\end{pygmented}
+\end{samepage}
+
 \subsection{Versionhallinnan alustaminen}
 
 Jos olet käyttämässä Git-versionhallintaa ensimmäistä kertaa, katso
