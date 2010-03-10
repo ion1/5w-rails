@@ -21,7 +21,7 @@ Feature: Manage projects
     # TODO: Who
 
   Scenario Outline: Add an invalid project
-    Given I am on New Project page
+    Given I am on the New Project page
     When I fill in "Name" with "<name>"
     And I fill in "What" with "<what>"
     And I fill in "When" with "<when>"
