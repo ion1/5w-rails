@@ -53,43 +53,45 @@ joka on vielä beta-vaiheessa.
 Asenna ensin Ruby~1.9.1 järjestelmään. Debianissa ja Ubuntussa tarvittavat
 paketit tulevat ri1.9.1-paketin riippuvuuksina.
 
-\begin{pygmented}{sh}
-sudo apt-get install ri1.9.1
+\begin{pygmented}{console}
+% sudo apt-get install ri1.9.1
 \end{pygmented}
+
+(Huom. \% merkitsee shellin komentokehotetta.)
 \end{samepage}
 
 \begin{samepage}
 Asenna uusin RubyGems-versio omaan kotihakemistoosi. Kirjoitushetkellä
 Debianissa ja Ubuntussa oleva RubyGems-versio on liian vanha.
 
-\begin{pygmented}{sh}
-mkdir -p /tmp/src/rubygems
-cd /tmp/src/rubygems
+\begin{pygmented}{console}
+% mkdir -p /tmp/src/rubygems
+% cd /tmp/src/rubygems
 
-# http://rubygems.org/pages/download
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.6.tgz
+(http://rubygems.org/pages/download)
+% wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.6.tgz
 
-tar zxf rubygems-1.3.6.tgz
-cd rubygems-1.3.6
+% tar zxf rubygems-1.3.6.tgz
+% cd rubygems-1.3.6
 
-export GEM_HOME="$HOME/.gem/ruby/1.9.1"
-export PATH="$PATH:$GEM_HOME/bin:$HOME/.gem/rubygems/bin"
-export RUBYLIB="$HOME/.gem/rubygems/lib"
+% export GEM_HOME="$HOME/.gem/ruby/1.9.1"
+% export PATH="$PATH:$GEM_HOME/bin:$HOME/.gem/rubygems/bin"
+% export RUBYLIB="$HOME/.gem/rubygems/lib"
 
-ruby1.9.1 setup.rb --prefix="$HOME/.gem/rubygems"
+% ruby1.9.1 setup.rb --prefix="$HOME/.gem/rubygems"
 \end{pygmented}
 \end{samepage}
 
-Lisää myös nuo kolme export-riviä shellisi käynnistystiedostoon (esim.
+Lisää myös nuo kolme export-komentoa shellisi käynnistystiedostoon (esim.
 \textasciitilde/.bashrc tai \textasciitilde/.zshrc), jotta RubyGems-asennus
 toimii jatkossakin käynnistämissäsi shelleissä.
 
 \begin{samepage}
 Seuraavaksi asenna Rails~3.
 
-\begin{pygmented}{sh}
-sudo apt-get install ruby1.9.1-dev libsqlite3-dev libopenssl-ruby1.9.1
-gem1.9.1 install rails --pre
+\begin{pygmented}{console}
+% sudo apt-get install ruby1.9.1-dev libsqlite3-dev libopenssl-ruby1.9.1
+% gem1.9.1 install rails --pre
 \end{pygmented}
 \end{samepage}
 
@@ -102,18 +104,20 @@ t5w.fi-hakemiston, joka sisältää tyhjän Rails-projektin puun.
 Tulemme käyttämään RSpec-kirjastoa yksikkötestaukseen TestUnitin sijaan, ja
 jQuery-JavaScript-kirjastoa Prototypen sijaan. Lisää niistä myöhemmin.
 
-\begin{pygmented}{sh}
-cd ~/src
-rails t5w.fi --skip-testunit --skip-prototype
-cd t5w.fi
+\begin{pygmented}{console}
+% cd ~/src
+(or wherever you want to create the project)
+
+% rails t5w.fi --skip-testunit --skip-prototype
+% cd t5w.fi
 \end{pygmented}
 \end{samepage}
 
 \begin{samepage}
 Asenna Gemfile-tiedoston listaamat projektin riippuvuudet.
 
-\begin{pygmented}{sh}
-bundle install
+\begin{pygmented}{console}
+% bundle install
 \end{pygmented}
 \end{samepage}
 
@@ -126,9 +130,9 @@ kehitysympäristössä erilaiset kuin tuotantopalvelimella.
 Kopioi \en{config/database.yml} tiedostoon \en{config/database.yml.example}, ja
 varmista, että vain jälkimmäinen päätyy versionhallintaan.
 
-\begin{pygmented}{sh}
-cp config/database.yml{,.example}
-echo config/database.yml >>.gitignore
+\begin{pygmented}{console}
+% cp config/database.yml{,.example}
+% echo config/database.yml >>.gitignore
 \end{pygmented}
 \end{samepage}
 
@@ -142,8 +146,8 @@ Jotta db/schema.rb:n lisääminen versionhallintaan ei pääse myöhemmin
 unohtumaan, luodaan sen ensimmäinen (tyhjä) versio heti seuraavaa committia
 varten Rake-komennolla {\tt db:migrate}.
 
-\begin{pygmented}{sh}
-rake db:migrate
+\begin{pygmented}{console}
+% rake db:migrate
 \end{pygmented}
 \end{samepage}
 
@@ -153,12 +157,12 @@ Jos olet käyttämässä Git-versionhallintaa ensimmäistä kertaa, katso
 \hyperref[fig:git-initial-config]{kuva~\ref*{fig:git-initial-config}}.
 
 \begin{myfigure}
-\begin{pygmented}{sh}
-git config --global user.name 'Etunimi Sukunimi'
-git config --global user.email 'user@example.net'
-for n in branch diff grep interactive status ui; do
-  git config --global "color.$n" auto
-done
+\begin{pygmented}{console}
+% git config --global user.name 'Etunimi Sukunimi'
+% git config --global user.email 'user@example.net'
+% for n in branch diff grep interactive status ui; do
+>   git config --global "color.$n" auto
+> done
 \end{pygmented}
 \caption{Perusasetuksien teko ensimmäisellä Git-käyttökerralla}
 \label{fig:git-initial-config}
@@ -168,10 +172,10 @@ done
 Alusta Git nykyiseen hakemistoon, lisää sisältö seuraavaa committia varten ja
 luo ensimmäinen commit.
 
-\begin{pygmented}{sh}
-git init
-git add .
-git commit -m 'Initial import'
+\begin{pygmented}{console}
+% git init
+% git add .
+% git commit -m 'Initial import'
 \end{pygmented}
 \end{samepage}
 
@@ -242,11 +246,11 @@ end
 \begin{samepage}
 Aja seuraavat komennot, jotta kyseiset gemit asentuvat.
 
-\begin{pygmented}{sh}
-# webrat requires this
-sudo apt-get install libxslt-dev
+\begin{pygmented}{console}
+(webrat requires this)
+% sudo apt-get install libxslt-dev
 
-bundle install
+% bundle install
 \end{pygmented}
 \end{samepage}
 
@@ -254,15 +258,15 @@ bundle install
 Asenna RSpecin ja Cucumberin projektikohtaiset tiedostot, jotta testaus niillä
 onnistuu jatkossa.
 
-\begin{pygmented}{sh}
-script/rails generate rspec:install
-script/rails generate cucumber:skeleton
+\begin{pygmented}{console}
+% script/rails generate rspec:install
+% script/rails generate cucumber:skeleton
 
-# config/database.yml was modified, update example
-cp config/database.yml{,.example}
+(config/database.yml was modified, update example)
+% cp config/database.yml{,.example}
 
-git add .
-git commit -m 'Add RSpec and Cucumber'
+% git add .
+% git commit -m 'Add RSpec and Cucumber'
 \end{pygmented}
 \end{samepage}
 
@@ -308,14 +312,14 @@ tai {\em ''\en{Then I should see ...}''}.
 
 Tämän speksin ainoa testi, jonka toteuttavan koodin joudumme toteuttamaan itse,
 on {\em ''\en{Then I should see a timestamp no older/newer than ...}''}. Se
-demonstroidaan seuraavalla kerralla.
+demonstroidaan ajallaan.
 
 \begin{samepage}
 Tee myös tästä muutoksesta commit.
 
-\begin{pygmented}{sh}
-git add features
-git commit -m 'Add initial manage_projects feature'
+\begin{pygmented}{console}
+% git add features
+% git commit -m 'Add initial manage_projects feature'
 \end{pygmented}
 \end{samepage}
 
