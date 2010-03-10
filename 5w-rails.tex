@@ -107,6 +107,14 @@ cd t5w.fi
 \end{pygmented}
 \end{samepage}
 
+\begin{samepage}
+Asenna Gemfile-tiedoston listaamat projektin riippuvuudet.
+
+\begin{pygmented}{sh}
+bundle install
+\end{pygmented}
+\end{samepage}
+
 Luomassamme projektissa on tiedosto \en{config/database.yml}, joka sisältää
 asetukset tietokantaan yhdistämiseen. Emme halua sen päätyvän
 versionhallintaan, koska tietokanta-asetukset tulevat olemaan mm.
@@ -198,8 +206,7 @@ ja Cucumber\footnote{\url{http://cukes.info/}}-kirjastoa
 integraatiotestaukseen.
 
 \begin{samepage}
-Avaa Gemfile\footnote{Gemfile listaa sovelluksen
-RubyGems-riippuvuudet.}-tiedosto editoriin ja lisää siihen seuraavat rivit:
+Avaa Gemfile-tiedosto editoriin ja lisää siihen seuraavat rivit:
 
 \begin{pygmented}{ruby}
 group :test do
