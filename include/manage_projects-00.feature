@@ -38,7 +38,6 @@ Feature: Manage projects
 
   Scenario: List projects
     Given I am on the New Project page
-    When I fill
     When I fill in the following:
       | Name | 5w.fi            |
       | What | The 5w.fi portal |
