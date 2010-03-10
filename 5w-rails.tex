@@ -30,13 +30,13 @@
 
 \newcommand{\pdfforeignlanguage}[2]{\texorpdfstring{\foreignlanguage{#1}{#2}}{#2}}
 
-\newcommand{\en}[1]{\pdfforeignlanguage{english}{#1}}
+\newcommand{\eng}[1]{\pdfforeignlanguage{english}{#1}}
 \newenvironment{english}{\begin{otherlanguage}{english}}{\end{otherlanguage}}
 
 \newcommand{\fin}[1]{\pdfforeignlanguage{finnish}{#1}}
 \newenvironment{finnish}{\begin{otherlanguage}{finnish}}{\end{otherlanguage}}
 
-\title{\en{5w Ruby on Rails workshop}}
+\title{\eng{5w Ruby on Rails workshop}}
 \author{Johan Kiviniemi}
 
 \begin{document}
@@ -129,14 +129,14 @@ Asenna Gemfile-tiedoston listaamat projektin riippuvuudet.
 \end{pygmented}
 \end{samepage}
 
-Luomassamme projektissa on tiedosto \en{config/database.yml}, joka sisältää
+Luomassamme projektissa on tiedosto \eng{config/database.yml}, joka sisältää
 asetukset tietokantaan yhdistämiseen. Emme halua sen päätyvän
 versionhallintaan, koska tietokanta-asetukset tulevat olemaan mm.
 kehitysympäristössä erilaiset kuin tuotantopalvelimella.
 
 \begin{samepage}
-Kopioi \en{config/database.yml} tiedostoon \en{config/database.yml.example}, ja
-varmista, että vain jälkimmäinen päätyy versionhallintaan.
+Kopioi \eng{config/database.yml} tiedostoon \eng{config/database.yml.example},
+ja varmista, että vain jälkimmäinen päätyy versionhallintaan.
 
 \begin{pygmented}{console}
 % cp config/database.yml{,.example}
@@ -194,16 +194,16 @@ väliin, meillä ei olisi mitään takeita siitä, että kukin tuotantoon asenta
 ohjelmapäivitys toimii täysin oikein.
 
 Pieniä ja isompia bugeja livahtaa koodiin aina, ja hyvin tehty testisarja
-(engl. \en{test suite}) löytää ne nopeasti.
+(engl. \eng{test suite}) löytää ne nopeasti.
 
-Käytän tässä dokumentissa termiä integraatiotestaus (engl. \en{integration
+Käytän tässä dokumentissa termiä integraatiotestaus (engl. \eng{integration
 testing}) sovelluksen käyttäjälle näkyvän toiminnallisuuden kokonaisvaltaisesta
-testaamisesta, ja termiä yksikkötestaus (engl. \en{unit testing}) sovelluksen
+testaamisesta, ja termiä yksikkötestaus (engl. \eng{unit testing}) sovelluksen
 sisäisten rajapintojen testaamisesta.
 
 Testit on mahdollista kirjoittaa ennen tai jälkeen varsinaisen toteutuksen
 ohjelmoimista. Testien kirjoittamisesta etukäteen on joitakin
-etuja\footnote{\en{Test Driven Development; Behavior Driven Development;
+etuja\footnote{\eng{Test Driven Development; Behavior Driven Development;
 \url{http://en.wikipedia.org/wiki/Test-driven\_development##Benefits}}}:
 
 \begin{itemize}
@@ -278,30 +278,30 @@ onnistuu jatkossa.
 \end{pygmented}
 \end{samepage}
 
-\subsection{Ensimmäinen integraatiotesti: \en{Manage projects}}
+\subsection{Ensimmäinen integraatiotesti: \eng{Manage projects}}
 
-Luo editorissa tiedosto \en{features/manage\_projects.feature}
+Luo editorissa tiedosto \eng{features/manage\_projects.feature}
 (\myref{kuva}{fig:manage-projects-feature}).
 
 \begin{myfigure}
 \includecode{include/manage_projects-00.feature}
-\caption{\en{features/manage\_projects.feature}}
+\caption{\eng{features/manage\_projects.feature}}
 \label{fig:manage-projects-feature}
 \end{myfigure}
 
-Esimerkin alussa oleva \emph{@wip} (\emph{''\en{work in progress}''}) on tagi,
+Esimerkin alussa oleva \emph{@wip} (\emph{''\eng{work in progress}''}) on tagi,
 jonka perusteella voidaan rajata työn alla olevat speksit ajettavaksi kerralla.
 
-\en{Feature}-lohko alussa noudattaa tiettyä
+\eng{Feature}-lohko alussa noudattaa tiettyä
 formaattia\footnote{\url{http://wiki.github.com/aslakhellesoy/cucumber/gherkin}},
 mutta on pelkkää dokumentaatiota. Varsinaiset ajettavat testit ovat
-\en{Scenario}-lohkoissa.
+\eng{Scenario}-lohkoissa.
 
 Ensimmäinen skenaario testaa projektin onnistuneen lisäyksen käyttäjän
 näkökulmasta.
 
-Seuraava skenaario (huom. \emph{''\en{Scenario \textbf{Outline}}''})
-suoritetaan sen sisältämän \en{Examples}-taulukon mukaisesti neljä kertaa,
+Seuraava skenaario (huom. \emph{''\eng{Scenario \textbf{Outline}}''})
+suoritetaan sen sisältämän \eng{Examples}-taulukon mukaisesti neljä kertaa,
 täydentäen kulmasulkeiden sisältämien kenttien tilalle arvot taulukosta.
 Kyseinen skenaario varmistaa virheenkäsittelyn toiminnan jättäen kullakin
 kerralla yhden kentistä tyhjäksi (täyttäen muut validilla arvolla
@@ -310,15 +310,15 @@ kerralla yhden kentistä tyhjäksi (täyttäen muut validilla arvolla
 Viimeinen skenaario on samankaltainen ensimmäisen kanssa, mutta se varmistaa,
 että lisätty projekti ilmestyy myös projektilistaan.
 
-Risuaidalla alkavat rivit ovat kommentteja: \en{Who}-kenttien testaus
+Risuaidalla alkavat rivit ovat kommentteja: \eng{Who}-kenttien testaus
 toteutetaan myöhemmin, kun sovellukseen lisätään tuki käyttäjätunnuksille.
 
-Cucumber-Railsin mukana tulee ohjelmakoodia, jonka perusteella \en{Cucumber}
-tietää, mitä tehdä, kun speksissä lukee esim. \emph{''\en{When I press
-\dots}''} tai \emph{''\en{Then I should see \dots}''}.
+Cucumber-Railsin mukana tulee ohjelmakoodia, jonka perusteella \eng{Cucumber}
+tietää, mitä tehdä, kun speksissä lukee esim. \emph{''\eng{When I press
+\dots}''} tai \emph{''\eng{Then I should see \dots}''}.
 
 Tämän speksin ainoa testi, jonka toteuttavan koodin joudumme toteuttamaan itse,
-on \emph{''\en{Then I should see a timestamp no older/newer than \dots}''}. Se
+on \emph{''\eng{Then I should see a timestamp no older/newer than \dots}''}. Se
 demonstroidaan ajallaan.
 
 \begin{samepage}
