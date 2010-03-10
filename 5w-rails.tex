@@ -26,6 +26,8 @@
   \end{figure}
 }
 
+\newcommand{\myref}[2]{\hyperref[#2]{#1~\ref*{#2}}}
+
 \newcommand{\en}[1]{\foreignlanguage{english}{#1}}
 
 \title{\en{5w Ruby on Rails workshop}}
@@ -154,7 +156,7 @@ varten Rake-komennolla \texttt{db:migrate}.
 \subsection{Versionhallinnan alustaminen}
 
 Jos olet käyttämässä Git-versionhallintaa ensimmäistä kertaa, katso
-\hyperref[fig:git-initial-config]{kuva~\ref*{fig:git-initial-config}}.
+\myref{kuva}{fig:git-initial-config}.
 
 \begin{myfigure}
 \begin{pygmented}{console}
@@ -275,7 +277,7 @@ onnistuu jatkossa.
 \subsection{Ensimmäinen integraatiotesti: Manage projects}
 
 Luo editorissa tiedosto \en{features/manage\_projects.feature}
-(\hyperref[fig:manage-projects-feature]{kuva~\ref*{fig:manage-projects-feature}}).
+(\myref{kuva}{fig:manage-projects-feature}).
 
 \begin{myfigure}
 \includecode{include/manage_projects-00.feature}
