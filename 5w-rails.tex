@@ -144,7 +144,7 @@ uudet tietokannat alustetaan suoraan kyseisen tiedoston perusteella.
 \begin{samepage}
 Jotta db/schema.rb:n lisääminen versionhallintaan ei pääse myöhemmin
 unohtumaan, luodaan sen ensimmäinen (tyhjä) versio heti seuraavaa committia
-varten Rake-komennolla {\tt db:migrate}.
+varten Rake-komennolla \texttt{db:migrate}.
 
 \begin{pygmented}{console}
 % rake db:migrate
@@ -283,7 +283,7 @@ Luo editorissa tiedosto \en{features/manage\_projects.feature}
 \label{fig:manage-projects-feature}
 \end{myfigure}
 
-Esimerkin alussa oleva {\em @wip} ({\em ''\en{work in progress}''}) on tagi,
+Esimerkin alussa oleva \emph{@wip} (\emph{''\en{work in progress}''}) on tagi,
 jonka perusteella voidaan rajata työn alla olevat speksit ajettavaksi kerralla.
 
 \en{Feature}-lohko alussa noudattaa tiettyä
@@ -294,11 +294,12 @@ mutta on pelkkää dokumentaatiota. Varsinaiset ajettavat testit ovat
 Ensimmäinen skenaario testaa projektin onnistuneen lisäyksen käyttäjän
 näkökulmasta.
 
-Seuraava skenaario (huom. {\em ''\en{Scenario {\bf Outline}}''}) suoritetaan
-sen sisältämän \en{Examples}-taulukon mukaisesti neljä kertaa, täydentäen
-kulmasulkeiden sisältämien kenttien tilalle arvot taulukosta. Kyseinen
-skenaario varmistaa virheenkäsittelyn toiminnan jättäen kullakin kerralla yhden
-kentistä tyhjäksi (täyttäen muut validilla arvolla {\em ''x''}).
+Seuraava skenaario (huom. \emph{''\en{Scenario \textbf{Outline}}''})
+suoritetaan sen sisältämän \en{Examples}-taulukon mukaisesti neljä kertaa,
+täydentäen kulmasulkeiden sisältämien kenttien tilalle arvot taulukosta.
+Kyseinen skenaario varmistaa virheenkäsittelyn toiminnan jättäen kullakin
+kerralla yhden kentistä tyhjäksi (täyttäen muut validilla arvolla
+\emph{''x''}).
 
 Viimeinen skenaario on samankaltainen ensimmäisen kanssa, mutta se varmistaa,
 että lisätty projekti ilmestyy myös projektilistaan.
@@ -307,11 +308,11 @@ Risuaidalla alkavat rivit ovat kommentteja: \en{Who}-kenttien testaus
 toteutetaan myöhemmin, kun sovellukseen lisätään tuki käyttäjätunnuksille.
 
 Cucumber-Railsin mukana tulee ohjelmakoodia, jonka perusteella \en{Cucumber}
-tietää, mitä tehdä, kun speksissä lukee esim. {\em ''\en{When I press \dots}''}
-tai {\em ''\en{Then I should see \dots}''}.
+tietää, mitä tehdä, kun speksissä lukee esim. \emph{''\en{When I press
+\dots}''} tai \emph{''\en{Then I should see \dots}''}.
 
 Tämän speksin ainoa testi, jonka toteuttavan koodin joudumme toteuttamaan itse,
-on {\em ''\en{Then I should see a timestamp no older/newer than \dots}''}. Se
+on \emph{''\en{Then I should see a timestamp no older/newer than \dots}''}. Se
 demonstroidaan ajallaan.
 
 \begin{samepage}
