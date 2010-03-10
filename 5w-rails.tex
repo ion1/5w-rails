@@ -330,6 +330,174 @@ Tee myös tästä muutoksesta commit.
 \end{pygmented}
 \end{samepage}
 
+\section{Sessio 2010-03-09}
+
+\subsection{Cucumber-testien ajo}
+
+Aja \emph{wip}-tagilla merkityt testit Rake-komennolla \texttt{cucumber:wip}.
+Ensimmäinen ilmoitus epäonnistuneesta testistä kertoo, mitä tulee toteuttaa
+seuraavaksi.
+
+\begin{pygmented}{console}
+% rake cucumber:wip
+...
+  Scenario: Add a new project                           # features/manage_projects.feature:7
+    Given I am on the New Project page                  # features/step_definitions/web_steps.rb:14
+      Can't find mapping from "the New Project page" to a path.
+      Now, go and add a mapping in features/support/paths.rb (RuntimeError)
+\end{pygmented}
+
+Koska projects-koodia ei ole, ei ole New Project -sivuakaan. Seuraavana on siis
+sen toteuttaminen. Pohjustan ensin joitakin Railsin konsepteja.
+
+\subsection[MVC, model--view--controller-arkkitehtuuri]{MVC,
+model--view--controller-arkkitehtuuri\footnote{\url{http://en.wikipedia.org/wiki/Model-view-controller}}}
+
+On hyvä erotella sovellus riittävän pieniin, irrallisiin osiin, joista kutakin
+voidaan kehittää, testata ja ylläpitää erikseen. Rails-projektit käyttävät
+suosittua MVC-arkkitehtuuria.
+
+\begin{description}
+\item[Model (malli)]
+Sovelluksen käyttämän datan (esim. tietokanta tai sellaisen tapaan käytettävä
+web-rajapinta) kuvaus ja sovelluksen logiikka.
+
+\item[View (näkymä)]
+Mallien esitysmuoto. Yksi näkymä saattaa esittää useampaa mallia (esim.
+uutisartikkelin web-sivu, joka listaa artikkelin kommentit), ja yhdelle
+mallille voi olla useampi näkymä (esim. uusimmat artikkelit listaava web-sivu
+ja uusimpien artikkeleiden Atom-syöte).
+
+\item[Controller (ohjain)]
+Ohjain käsittelee käyttäjältä tulevan syötteen ja vastaa siihen kommunikoiden
+mallin ja näkymän kanssa sen perusteella.
+\end{description}
+
+\subsection[REST, Representational State Transfer]{REST, Representational State
+Transfer\footnote{\url{http://en.wikipedia.org/wiki/Representational\_State\_Transfer}}}
+
+Käsittelen Rails-projektin kannalta oleellisimmat REST-konseptin
+yksityiskohdat.
+
+\begin{samepage}
+Kiinnitä huomio seuraaviin esimerkkeihin HTTP-pyynnöistä.
+
+\begin{english}
+\begin{tabular}{|r|l|}
+\hline
+Method & Path                \\
+\hline
+POST   & /projects/create    \\
+GET    & /projects/42        \\
+POST   & /projects/update/42 \\
+POST   & /projects/delete/42 \\
+\hline
+\end{tabular}
+\end{english}
+\end{samepage}
+
+Ensinnäkin on havaittavissa toistoa: pyynnöissä on verbejä (\eng{create,
+update, delete}), mutta jokaiseen HTTP-pyyntöön kuuluu verbi metodin muodossa
+joka tapauksessa.
+
+\begin{samepage}
+Lisäksi jos hyödyntäisimme HTTP-verbejä kyseisissä pyynnöissä, samaa resurssia
+käsittelevien pyyntöjen polut muuttuisivat samoiksi; tässä voi havaita tiettyä
+eleganssia.
+
+\begin{english}
+\begin{tabular}{|r|l|}
+\hline
+Method & Path         \\
+\hline
+POST   & /projects    \\
+GET    & /projects/42 \\
+PUT    & /projects/42 \\
+DELETE & /projects/42 \\
+\hline
+\end{tabular}
+\end{english}
+\end{samepage}
+
+Kyseisistä neljästä verbistä käytetään termiä \eng{CRUD -- create, read,
+update,
+delete}\footnote{\url{http://en.wikipedia.org/wiki/Create,\_read,\_update\_and\_delete}}
+(\myref{kuva}{fig:crud}).
+
+\begin{myfigure}
+\centering
+\begin{english}
+\begin{tabular}{|c|c|c|}
+\hline
+       & SQL    & HTTP   \\
+\hline
+Create & INSERT & POST   \\
+Read   & SELECT & GET    \\
+Update & UPDATE & PUT    \\
+Delete & DELETE & DELETE \\
+\hline
+\end{tabular}
+\end{english}
+\caption{CRUD-verbit eräissä syntakseissa}
+\label{fig:crud}
+\end{myfigure}
+
+\begin{samepage}
+Mitä käytännön hyötyä on saavutettu? Ei oikeastaan vielä mitään merkittävää.
+Hyötyjä havainnollistetaan seuraavalla esimerkillä.
+
+\begin{english}
+\begin{tabular}{|r|l|l|}
+\hline
+Method & Path                      & Body           \\
+\hline
+POST   & /projects/42/add\_user    & user\_id=5     \\
+POST   & /projects/42/delete\_user & user\_id=5     \\
+\hline
+POST   & /users/5/join\_project    & project\_id=42 \\
+POST   & /users/5/leave\_project   & project\_id=42 \\
+\hline
+\end{tabular}
+\end{english}
+\end{samepage}
+
+Kumpaan ohjaimeen käyttäjän liittäminen projektiin kuuluu -- projektit vai
+käyttäjät?
+
+Pitäisikö projekti- vai käyttäjämallin varmistaa, sallitaanko tietyn käyttäjän
+poistaminen projektista?
+
+Jos haluttaisiin talteen kunkin jäsenen liittymisajankohta kuhunkin projektiin
+ja käyttäjän halutessaan syöttämä roolinsa kussakin projektissa, minkä mallin
+tulisi pitää tästä kaikesta kirjaa?
+
+Tämä kaikki muuttuu selkeämmäksi, kun annamme projektien ja käyttäjien
+väliselle relaatiolle nimen: \emph{\eng{project memberships}}.
+
+\begin{samepage}
+Nyt projektiin liittyminen ja siitä poistuminen muuttuu jäsenyyden luomiseksi
+(\eng{create}) ja poistamiseksi (\eng{delete}), ja roolin muuttaminen muuttuu
+jäsenyyden päivittämiseksi (\eng{update}). Pyynnöt käsittelee
+\eng{project\_memberships}-ohjain.
+
+\begin{english}
+\begin{tabular}{|r|l|l|}
+\hline
+Method & Path                    & Body                              \\
+\hline
+POST   & /project\_memberships   & user\_id=5\&project\_id=42\&role= \\
+PUT    & /project\_memberships/9 & role=Moral support                \\
+DELETE & /project\_memberships/9 &                                   \\
+\hline
+\end{tabular}
+\end{english}
+\end{samepage}
+
+Rails tekee CRUD-toimintamallin noudattamisen hyvin helpoksi, kuten myöhemmin
+tullaan näkemään. Samoin kuin esim. MVC:n, myös CRUDin myötä on monesti yksi
+asia vähemmän mietittävänä: tietylle asialle on heti selkeä paikka ja
+samankaltaiset asiat tapahtuvat konsistentimmin keskenään.
+
 \end{document}
 
 % vim:set et sw=2 sts=2:
