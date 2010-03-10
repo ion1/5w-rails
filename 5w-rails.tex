@@ -28,7 +28,13 @@
 
 \newcommand{\myref}[2]{\hyperref[#2]{#1~\ref*{#2}}}
 
-\newcommand{\en}[1]{\foreignlanguage{english}{#1}}
+\newcommand{\pdfforeignlanguage}[2]{\texorpdfstring{\foreignlanguage{#1}{#2}}{#2}}
+
+\newcommand{\en}[1]{\pdfforeignlanguage{english}{#1}}
+\newenvironment{english}{\begin{otherlanguage}{english}}{\end{otherlanguage}}
+
+\newcommand{\fin}[1]{\pdfforeignlanguage{finnish}{#1}}
+\newenvironment{finnish}{\begin{otherlanguage}{finnish}}{\end{otherlanguage}}
 
 \title{\en{5w Ruby on Rails workshop}}
 \author{Johan Kiviniemi}
@@ -272,9 +278,7 @@ onnistuu jatkossa.
 \end{pygmented}
 \end{samepage}
 
-% Why doesn’t this work?
-%\subsection{Ensimmäinen integraatiotesti: \en{Manage projects}}
-\subsection{Ensimmäinen integraatiotesti: Manage projects}
+\subsection{Ensimmäinen integraatiotesti: \en{Manage projects}}
 
 Luo editorissa tiedosto \en{features/manage\_projects.feature}
 (\myref{kuva}{fig:manage-projects-feature}).
