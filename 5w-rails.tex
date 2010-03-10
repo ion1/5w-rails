@@ -129,14 +129,14 @@ Asenna Gemfile-tiedoston listaamat projektin riippuvuudet.
 \end{pygmented}
 \end{samepage}
 
-Luomassamme projektissa on tiedosto \eng{config/database.yml}, joka sisältää
+Luomassamme projektissa on tiedosto config/database.yml, joka sisältää
 asetukset tietokantaan yhdistämiseen. Emme halua sen päätyvän
 versionhallintaan, koska tietokanta-asetukset tulevat olemaan mm.
 kehitysympäristössä erilaiset kuin tuotantopalvelimella.
 
 \begin{samepage}
-Kopioi \eng{config/database.yml} tiedostoon \eng{config/database.yml.example},
-ja varmista, että vain jälkimmäinen päätyy versionhallintaan.
+Kopioi config/database.yml tiedostoon config/database.yml.example, ja varmista,
+että vain jälkimmäinen päätyy versionhallintaan.
 
 \begin{pygmented}{console}
 % cp config/database.yml{,.example}
@@ -280,12 +280,12 @@ onnistuu jatkossa.
 
 \subsection{Ensimmäinen integraatiotesti: \eng{Manage projects}}
 
-Luo editorissa tiedosto \eng{features/manage\_projects.feature}
+Luo editorissa tiedosto features/manage\_projects.feature
 (\myref{kuva}{fig:manage-projects-feature}).
 
 \begin{myfigure}
 \includecode{include/manage_projects-00.feature}
-\caption{\eng{features/manage\_projects.feature}}
+\caption{features/manage\_projects.feature}
 \label{fig:manage-projects-feature}
 \end{myfigure}
 
