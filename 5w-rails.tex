@@ -239,9 +239,39 @@ Capybara\footnote{\url{http://github.com/jnicklas/capybara\#readme}}-selainsimul
 Avaa Gemfile-tiedosto editoriin ja lisää siihen seuraavat rivit:
 
 \begin{pygmented}{ruby}
+# Use RSpec for unit testing.
 group :test do
   gem 'rspec', '>= 2.0.0.a'
   gem 'rspec-rails', '>= 2.0.0.a'
+end
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Aja seuraava komento, jotta kyseiset gemit asentuvat.
+
+\begin{pygmented}{console}
+% bundle install
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Asenna RSpecin projektikohtaiset tiedostot, jotta testaus sillä onnistuu
+jatkossa.
+
+\begin{pygmented}{console}
+% script/rails generate rspec:install
+% git add .
+% git commit -m 'Add RSpec'
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Muokkaa jälleen Gemfile-tiedostoa lisäten seuraavat rivit:
+
+\begin{pygmented}{ruby}
+# Use Cucumber with Capybara for integration testing.
+group :test do
   gem 'capybara'
   # The slimmed down version of test-unit in Ruby 1.9.1 isn't enough for
   # Cucumber.
@@ -253,25 +283,17 @@ end
 \end{samepage}
 
 \begin{samepage}
-Aja seuraavat komennot, jotta kyseiset gemit asentuvat.
+Asenna kyseiset gemit.
 
 \begin{pygmented}{console}
-(webrat requires this)
-% sudo apt-get install libxslt-dev
-
 % bundle install
 \end{pygmented}
 \end{samepage}
 
 \begin{samepage}
-Asenna RSpecin ja Cucumberin projektikohtaiset tiedostot, jotta testaus niillä
-onnistuu jatkossa.
+Asenna Cucumberin projektikohtaiset tiedostot.
 
 \begin{pygmented}{console}
-% script/rails generate rspec:install
-% git add .
-% git commit -m 'rspec:install'
-
 % script/rails generate cucumber:skeleton --capybara --rspec
 ...
        force  config/database.yml
@@ -281,7 +303,7 @@ onnistuu jatkossa.
 % cp config/database.yml{,.example}
 
 % git add .
-% git commit -m 'cucumber:skeleton'
+% git commit -m 'Add Cucumber'
 \end{pygmented}
 \end{samepage}
 
