@@ -296,8 +296,8 @@ Luo editorissa tiedosto features/manage\_projects.feature
 \label{fig:manage-projects-feature}
 \end{myfigure}
 
-Esimerkin alussa oleva \emph{@wip} (\emph{''\eng{work in progress}''}) on tagi,
-jonka perusteella voidaan rajata työn alla olevat speksit ajettavaksi kerralla.
+Esimerkin alussa oleva ''@wip'' (''\eng{work in progress}'') on tagi, jonka
+perusteella voidaan rajata työn alla olevat speksit ajettavaksi kerralla.
 
 \eng{Feature}-lohko alussa noudattaa tiettyä
 formaattia\footnote{\url{http://wiki.github.com/aslakhellesoy/cucumber/gherkin}},
@@ -307,12 +307,11 @@ mutta on pelkkää dokumentaatiota. Varsinaiset ajettavat testit ovat
 Ensimmäinen skenaario testaa projektin onnistuneen lisäyksen käyttäjän
 näkökulmasta.
 
-Seuraava skenaario (huom. \emph{''\eng{Scenario \textbf{Outline}}''})
-suoritetaan sen sisältämän \eng{Examples}-taulukon mukaisesti neljä kertaa,
-täydentäen kulmasulkeiden sisältämien kenttien tilalle arvot taulukosta.
-Kyseinen skenaario varmistaa virheenkäsittelyn toiminnan jättäen kullakin
-kerralla yhden kentistä tyhjäksi (täyttäen muut validilla arvolla
-\emph{''x''}).
+Seuraava skenaario (huom. ''\eng{Scenario \emph{Outline}}'') suoritetaan sen
+sisältämän \eng{Examples}-taulukon mukaisesti neljä kertaa, täydentäen
+kulmasulkeiden sisältämien kenttien tilalle arvot taulukosta.  Kyseinen
+skenaario varmistaa virheenkäsittelyn toiminnan jättäen kullakin kerralla yhden
+kentistä tyhjäksi (täyttäen muut validilla arvolla ''x'').
 
 Viimeinen skenaario on samankaltainen ensimmäisen kanssa, mutta se varmistaa,
 että lisätty projekti ilmestyy myös projektilistaan.
@@ -321,11 +320,11 @@ Risuaidalla alkavat rivit ovat kommentteja: \eng{Who}-kenttien testaus
 toteutetaan myöhemmin, kun sovellukseen lisätään tuki käyttäjätunnuksille.
 
 Cucumber-Railsin mukana tulee ohjelmakoodia, jonka perusteella \eng{Cucumber}
-tietää, mitä tehdä, kun speksissä lukee esim. \emph{''\eng{When I press
-\dots}''} tai \emph{''\eng{Then I should see \dots}''}.
+tietää, mitä tehdä, kun speksissä lukee esim. ''\eng{When I press \dots''} tai
+''\eng{Then I should see \dots}''.
 
 Tämän speksin ainoa testi, jonka toteuttavan koodin joudumme toteuttamaan itse,
-on \emph{''\eng{Then I should see a timestamp no older/newer than \dots}''}. Se
+on ''\eng{Then I should see a timestamp no older/newer than \dots}''. Se
 demonstroidaan ajallaan.
 
 \begin{samepage}
@@ -341,7 +340,7 @@ Tee myös tästä muutoksesta commit.
 
 \subsection{Cucumber-testien ajo}
 
-Aja \emph{wip}-tagilla merkityt testit Rake-komennolla \texttt{cucumber:wip}.
+Aja wip-tagilla merkityt testit Rake-komennolla \texttt{cucumber:wip}.
 Ensimmäinen ilmoitus epäonnistuneesta testistä kertoo, mitä tulee toteuttaa
 seuraavaksi.
 
