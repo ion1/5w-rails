@@ -232,7 +232,8 @@ seuraavaksi ja milloin speksi on implementoitu.
 
 Käytämme RSpec\footnote{\url{http://rspec.info/}}-kirjastoa yksikkötestaukseen
 ja Cucumber\footnote{\url{http://cukes.info/}}-kirjastoa
-integraatiotestaukseen.
+integraatiotestaukseen, hyödyntäen
+Capybara\footnote{\url{http://github.com/jnicklas/capybara\#readme}}-selainsimulaattoria.
 
 \begin{samepage}
 Avaa Gemfile-tiedosto editoriin ja lisää siihen seuraavat rivit:
@@ -241,12 +242,12 @@ Avaa Gemfile-tiedosto editoriin ja lisää siihen seuraavat rivit:
 group :test do
   gem 'rspec', '>= 2.0.0.a'
   gem 'rspec-rails', '>= 2.0.0.a'
-  gem 'webrat'
+  gem 'capybara'
   # The slimmed down version of test-unit in Ruby 1.9.1 isn't enough for
   # Cucumber.
   gem 'test-unit'
   gem 'cucumber'
-  gem 'cucumber-rails'
+  gem 'cucumber-rails', :git => 'git://github.com/ion1/cucumber-rails.git'
 end
 \end{pygmented}
 \end{samepage}
@@ -268,13 +269,19 @@ onnistuu jatkossa.
 
 \begin{pygmented}{console}
 % script/rails generate rspec:install
-% script/rails generate cucumber:skeleton
+% git add .
+% git commit -m 'rspec:install'
+
+% script/rails generate cucumber:skeleton --capybara --rspec
+...
+       force  config/database.yml
+...
 
 (config/database.yml was modified, update example)
 % cp config/database.yml{,.example}
 
 % git add .
-% git commit -m 'Add RSpec and Cucumber'
+% git commit -m 'cucumber:skeleton'
 \end{pygmented}
 \end{samepage}
 
