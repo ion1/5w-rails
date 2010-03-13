@@ -515,6 +515,958 @@ tullaan näkemään. Samoin kuin esim. MVC:n, myös CRUDin myötä on monesti yk
 asia vähemmän mietittävänä: tietylle asialle on heti selkeä paikka ja
 samankaltaiset asiat tapahtuvat konsistentimmin keskenään.
 
+Eräs asia on vielä käsittelemättä. Jotta uuden projektin luonti \texttt{POST
+/projects} -pyynnöllä tai olemassa olevan projektin muokkaaminen \texttt{PUT
+/projects/42} -pyynnöllä onnistuu selaimella, HTML-lomakkeen pitää olla
+olemassa kyseistä pyyntöä varten.
+
+CRUD-toimintatapa ei suoraan kerro, millainen lomakkeen tuottavan HTTP-pyynnön
+pitäisi olla, mutta sitä voidaan soveltaa seuraavasti:
+
+\begin{samepage}
+HTTP-metodin tulee selkeästi olla \texttt{GET}, koska pelkkää lomaketta
+pyytäessä ei olla luomassa, muokkaamassa tai tuhoamassa mitään. Polkua varten
+Rails käyttää seuraavaa ajatustapaa: samaten kuin resurssin
+(\texttt{/projects}, \texttt{/projects/42}) perään voidaan lisätä
+vaihtoehtoinen formaatti (esim. \texttt{/projects.xml},
+\texttt{/projects/42.xml}), resurssin perään voidaan myös lisätä ikään kuin
+vaihtoehtoinen \emph{aspekti}, joka resurssista halutaan.
+
+\begin{tabular}{rll}
+Metodi     & Polku                     & Selitys                                                 \\
+\hline
+\verb!GET! & \verb!/projects!          & Lista projekteista                                      \\
+\verb!GET! & \verb!/projects.xml!      & Lista projekteista XML-muodossa                         \\
+\hline
+\verb!GET! & \verb!/projects/42!       & Projektin näkymä                                        \\
+\verb!GET! & \verb!/projects/42.xml!   & Projektin näkymä XML-muodossa                           \\
+\verb!GET! & \verb!/projects/42/edit!  & Projektin editointinäkymä; lomake projektin editointiin \\
+\verb!GET! & \verb!/projects/new!      & Uuden projektin luontinäkymä; lomake projektin luontiin \\
+\verb!GET! & \verb!/projects/new.xml!  & Alustava XML-pohja uuden projektin luontiin             \\
+\end{tabular}
+\end{samepage}
+
+\section{Seuraava sessio}
+
+Jäimme siihen, että ensimmäinen epäonnistunut testi on ''New Project -sivua ei
+löydy''.
+
+\texttt{script/rails generate} -komento tarjoaa tavan luoda tiedostopohjia
+asioille, joita tullaan tekemään usein. Tutustumme siihen tarkemmin myöhemmin,
+mutta käytämme tässä vaiheessa sen \eng{scaffold}-toimintoa.
+
+\eng{Scaffold} (suom. rakennusteline) luo mallin sekä sille ohjaimen ja
+näkymiä. Kaikki nämä ovat alustavia versioita, joita tulemme kehittämään
+tarpeidemme mukaisesti.
+
+\subsection{\eng{Scaffold} projektisivulle}
+
+\begin{samepage}
+Aja seuraava komento. Katsomme sitten, mitä tiedostoja se loi.
+
+\begin{pygmented}{console}
+% script/rails generate scaffold project name:string what:text when:text why:text
+\end{pygmented}
+\end{samepage}
+
+\subsubsection{\eng{Model}}
+
+Kuten sanottu, Railsin migrations-toiminto hoitaa olemassa olevan tietokannan
+päivittämisen uuden koodin kanssa yhteensopivaksi. Rails ylläpitää kussakin
+tietokannassa listaa siitä, mitkä migraatiot on jo toteutettu.
+
+\begin{samepage}
+\myref{Kuvassa}{fig:create-projects-migration} on
+\texttt{CreateProjects}-migraation sisältö.
+
+\begin{myfigure}[H]
+\caption{\texttt{db/migrate/20100312170522\_create\_projects.rb}}
+\label{fig:create-projects-migration}
+
+\begin{pygmented}{ruby}
+class CreateProjects < ActiveRecord::Migration
+  def self.up
+    create_table :projects do |t|
+      t.string :name
+      t.text :what
+      t.text :when
+      t.text :why
+
+      t.timestamps
+    end
+  end
+
+  def self.down
+    drop_table :projects
+  end
+end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Tiedoston määrittelemä \texttt{up}-metodi suoritetaan migraatiota tehdessä ja
+\texttt{down} sitä peruessa. \texttt{down}-metodin tulisi perua kaikki
+\texttt{up}-metodin tekemät muutokset.
+
+\texttt{create\_table}-metodikutsu luo uuden, projects-nimisen taulun
+tietokantaan. Tauluun tulee vakiona id-kenttä. Sen lisäksi tauluun tulevat
+name, what, when ja why -kentät, jotka listattiin \texttt{generate scaffold}
+-komennon parametreinä.
+
+Tauluun luodaan myös created\_at- ja updated\_at -kentät, joiden arvoja Rails
+ylläpitää automaattisesti uusia tietokantarivejä luodessa ja olemassa olevia
+päivittäessä. Mikäli tätä ei haluta, \texttt{t.timestamps}-rivi voidaan poistaa
+tiedostosta, tai scaffold-generaattorille voidaan alunperin antaa parametri
+\texttt{--no-timestamps}.
+
+\begin{samepage}
+Päivitä development-tietokanta ja tiedosto \texttt{db/schema.rb}.
+
+\begin{pygmented}{console}
+% rake db:migrate
+==  CreateProjects: migrating =================================================
+-- create_table(:projects)
+   -> 0.0109s
+==  CreateProjects: migrated (0.0116s) ========================================
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+\myref{Kuvan}{fig:project-model-00} listaama tiedosto sisältää varsinaisen
+Project-mallin toteutuksen, joka on rajapinta tietokannan projects-tauluun.
+
+\begin{myfigure}[H]
+\caption{app/models/project.rb}
+\label{fig:project-model-00}
+
+\begin{pygmented}{ruby}
+class Project < ActiveRecord::Base
+end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Tällä hetkellä luokkamäärittely ei sisällä mitään muuta kuin
+\texttt{ActiveRecord::Base}-luokasta perityt asiat.
+
+ActiveRecordin dokumentaatio löytyy osoitteesta
+\url{http://ar.rubyonrails.org/} (FIXME: sivu dokumentoi Rails~2:n
+ActiveRecordia).
+
+Voit kokeilla luokan tarjoamaa rajapintaa irb:ssä, interaktiivisessa
+Ruby-kehotteessa, ajamalla komennon \texttt{script/rails console}. Esimerkki
+kokeilusessiosta:
+
+\begin{pygmented}{irb}
+>> Project.create :name => '5w.fi', :what => 'The 5w website'
+=> #<Project id: 1,
+             name: "5w.fi",
+             what: "The 5w website",
+             when: nil,
+             why: nil,
+             created_at: "2010-03-12 17:52:31",
+             updated_at: "2010-03-12 17:52:31">
+
+>> Project.create :name => 'Embiggen the cromulence of 5w'
+=> #<Project id: 2,
+             name: "Embiggen the cromulence of 5w",
+             what: nil,
+             when: nil,
+             why: nil,
+             created_at: "2010-03-12 17:55:11",
+             updated_at: "2010-03-12 17:55:11">
+
+>> website = Project.find_by_name '5w.fi'
+=> #<Project id: 1, name: "5w.fi", what: "The 5w website", ...>
+
+>> website.when = 'Yesterday'
+=> "Yesterday"
+
+>> website.save
+=> true
+
+>> updated_projects = Project.where('updated_at > created_at').order('updated_at DESC')
+=> #<ActiveRecord::Relation:0xb2670ac ...>
+
+>> updated_projects.all
+=> [#<Project id: 1, name: "5w.fi", ..., updated_at: "2010-03-12 17:56:54">]
+
+>> Project.last.update_attributes :why => 'To jovialize the hackerspace'
+=> true
+
+>> updated_projects.reload
+=> #<ActiveRecord::Relation:0xb2670ac>
+
+>> updated_projects.all
+=> [#<Project id: 2, name: "Embiggen the cromulence of 5w",
+              why: "To jovialize the hackerspace", ...,
+              updated_at: "2010-03-12 18:06:56">,
+    #<Project id: 1, name: "5w.fi", ..., updated_at: "2010-03-12 17:56:54">]
+\end{pygmented}
+
+\subsubsection{Reititys}
+\label{sec:projects-routing}
+
+Rails käyttää asetustiedostoa \texttt{config/routes.rb} sen määrittelyyn, minkä
+ohjaimen millekin metodille kukin HTTP-pyyntö ohjataan.
+
+\eng{Scaffold}-generaattori lisäsi tiedostoon automaattisesti rivin
+''\texttt{resources :projects}''.
+
+\texttt{resources}-kutsu luo automaattisesti REST-tyylisen reitityksen
+ohjaimelle, joka toteuttaa \texttt{index}-, \texttt{show}-, \texttt{new}-,
+\texttt{edit}-, \texttt{create}-, \texttt{update}- ja \texttt{destroy}
+-metodeista halutut.
+
+\begin{samepage}
+Voimme listata kaikki projektin reitit Rake-komennolla \texttt{routes}.
+
+\begin{pygmented}{console}
+% rake routes
+             GET    /projects(.:format)          {:controller=>"projects", :action=>"index"}
+    projects POST   /projects(.:format)          {:controller=>"projects", :action=>"create"}
+ new_project GET    /projects/new(.:format)      {:controller=>"projects", :action=>"new"}
+             GET    /projects/:id(.:format)      {:controller=>"projects", :action=>"show"}
+             PUT    /projects/:id(.:format)      {:controller=>"projects", :action=>"update"}
+     project DELETE /projects/:id(.:format)      {:controller=>"projects", :action=>"destroy"}
+edit_project GET    /projects/:id/edit(.:format) {:controller=>"projects", :action=>"edit"}
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Ensimmäisen sarakkeen arvot \texttt{projects}, \texttt{new\_project},
+\texttt{project} ja \texttt{edit\_project} merkitsevät, että Rails on
+automaattisesti luonut ohjainten ja näkymien käyttöön \texttt{\_path}- ja
+\texttt{\_url} -loppuiset metodit, jotka palauttavat kyseisen polun/URL:n.
+
+\begin{tabular}{ll}
+Kutsu                                    & Palautettu merkkijono                  \\
+\hline
+\verb!projects_path!                     & \verb!/projects!                       \\
+\verb!project_path(42)!                  & \verb!/projects/42!                    \\
+\verb!project_path(Project.find(42))!    & \verb!/projects/42!                    \\
+\verb!project_path(42, :format => :xml)! & \verb!/projects/42.xml!                \\
+\verb!new_project_path!                  & \verb!/projects/new!                   \\
+\verb!edit_project_path(42)!             & \verb!/projects/42/edit!               \\
+\hline
+\verb!projects_url!                      & \verb!http://example.net/projects!     \\
+\verb!new_project_url!                   & \verb!http://example.net/projects/new! \\
+\end{tabular}
+\end{samepage}
+
+\subsubsection{\eng{Controller} ja \eng{View}: \texttt{index}}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-controller-00-index} listaa projects-ohjaimen
+\texttt{index}-metodin. Rails kutsuu sitä, kun käyttäjä tekee
+\texttt{GET}-kutsun \texttt{/projects}-resurssille.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{index}-metodi}
+\label{fig:projects-controller-00-index}
+
+\begin{pygmented}{ruby}
+  # GET /projects
+  # GET /projects.xml
+  def index
+    @projects = Project.all
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @projects }
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Metodi pyytää ylempänä esitellyltä \texttt{Project}-mallilta listan kaikista
+projekteista ja sijoittaa sen \texttt{@projects}-jäsenmuuttujaan. Ohjaimen
+asettamat jäsenmuuttujat ovat näkymien käytettävissä.
+
+\texttt{respond\_to}-kutsulla metodi listaa formaatit, joilla se osaa
+renderöidä resurssin käyttäjälle. \eng{Scaffold} listaa vakiona HTML:n ja
+XML:n, joista jälkimmäinen soveltuu ohjelmallisen web-rajapinnan tarjoamiseen.
+
+Listassa voisi olla esim. JSON ja Atom, mikäli haluamme tarjota JSON-rajapinnan
+sekä Atom-syötteen.
+
+\begin{samepage}
+Tutustumme myöhemmin vaihtoehtoisten formaattien tarjoamiseen, mutta tuemme
+tässä vaiheessa vain HTML:ää yksinkertaisuuden nimissä. Muuta
+\texttt{index}-metodi \myref{kuvan}{fig:projects-controller-01-index} mukaiseen
+muotoon.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{index}-metodi yksinkertaisempana}
+\label{fig:projects-controller-01-index}
+
+\begin{pygmented}{ruby}
+  # GET /projects
+  def index
+    @projects = Project.scoped
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Muutimme samalla \texttt{Project.all}-kutsun \texttt{Project.scoped}-kutsuksi.
+Ensimmäinen tekee välittömästi tietokantahaun ja palauttaa taulukon,
+jälkimmäinen taas muodostaa \texttt{ActiveRecord::Relation}-olion, joka
+suorittaa tietokantahaun vasta silloin, kun näkymä lopulta käyttää sitä kuin
+taulukkoa.
+
+Rails renderöi automaattisesti \texttt{projects/index}-näkymän, johon
+tutustumme seuraavaksi.
+
+Näkymien tiedostonimet noudattavat muotoa \emph{nimi.formaatti.kieli}, josta
+esimerkkejä:
+
+\begin{itemize}
+\item
+\emph{index.html.erb}: Formaatti on HTML. Näkymä prosessoidaan
+ERB-templatekielellä.
+
+\item
+\emph{index.atom.builder}: Formaatti on Atom. Näkymä muodostetaan
+Builder-kirjastoa käyttäen. Builder tarjoaa kätevän rajapinnan XML-dokumenttien
+muodostamiseen.
+
+\item
+\emph{index.pdf.prawn}: Formaatti on PDF. Näkymä muodostetaan Prawn-kirjastoa
+käyttäen. Prawn tarjoaa kätevän rajapinnan PDF-dokumenttien muodostamiseen.
+\end{itemize}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-index-view-00} listaa \texttt{projects/index}-näkymän
+sisällön.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/projects/index.html.erb}}
+\label{fig:projects-index-view-00}
+
+\begin{pygmented}{html+erb}
+<h1>Listing projects</h1>
+
+<table>
+  <tr>
+    <th>Name</th><th>What</th><th>When</th><th>Why</th><th></th><th></th><th></th>
+  </tr>
+
+<% @projects.each do |project| %>
+  <tr>
+    <td><%= project.name %></td>
+    <td><%= project.what %></td>
+    <td><%= project.when %></td>
+    <td><%= project.why %></td>
+    <td><%= link_to 'Show', project %></td>
+    <td><%= link_to 'Edit', edit_project_path(project) %></td>
+    <td><%= link_to 'Destroy', project, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New project', new_project_path %>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Tiedostossa sellaisenaan oleva teksti päätyy tulosteeseen suoraan, mutta
+Ruby-koodi erityisen \verb!<% ... %>! -lohkon sisällä suoritetaan lisäämättä
+mitään tulosteeseen. \verb!<%= ... %>! -lohkon (huomaa \texttt{=}-merkki)
+sisältämän koodin palauttama merkkijono taas lisätään tulosteeseen.
+
+\verb!@projects.each do |project| ... end! -silmukka iteroi ohjaimessa
+määritellyn \texttt{@projects}-olion yli niin, että \texttt{project}-muuttuja
+viittaa kunkin iteraation kohdalla yksittäiseen \texttt{Project}-olioon, joka
+vastaa tietokannan yksittäistä riviä. Silmukan sisällä laitetaan
+td-elementtien sisälle projektin attribuutit \eng{name}, \eng{what}, \eng{when}
+ja \eng{why}.
+
+Lisäksi riville lisätään linkit projektikohtaiseen sivuun, projektin
+muokkaussivuun ja projektin tuhoamiseen. Tässä hyödynnetään Railsin
+\texttt{link\_to}-metodia, josta lisää myöhemmin.
+
+Tiedosto käyttää myös \texttt{edit\_project\_path}- ja
+\texttt{new\_project\_path} -metodeja, jotka käsiteltiin
+\myref{kappaleessa}{sec:projects-routing}.
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-index-view-00-example} listaa esimerkin silmukan
+sisällä muodostuvasta HTML:stä.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/projects/index.html.erb}: Esimerkkituloste}
+\label{fig:projects-index-view-00-example}
+
+\begin{pygmented}{html}
+  <tr>
+    <td>5w.fi</td>
+    <td>The 5w website</td>
+    <td>Yesterday</td>
+    <td></td>
+    <td><a href="/projects/1">Show</a></td>
+    <td><a href="/projects/1/edit">Edit</a></td>
+    <td><a href="/projects/1" data-confirm="Are you sure?" data-method="delete" rel="nofollow">Destroy</a></td>
+  </tr>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\subsubsection{\eng{Controller} ja \eng{View}: \texttt{show}}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-controller-00-show} listaa projects-ohjaimen
+\texttt{show}-metodin. Rails kutsuu sitä, kun käyttäjä tekee
+\texttt{GET}-kutsun \texttt{/projects/N}-resurssille, jossa \texttt{N} on
+projektin id-numero.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{show}-metodi}
+\label{fig:projects-controller-00-show}
+
+\begin{pygmented}{ruby}
+  # GET /projects/1
+  # GET /projects/1.xml
+  def show
+    @project = Project.find(params[:id])
+
+    respond_to do |format|
+      format.html # show.html.erb
+      format.xml  { render :xml => @project }
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Metodi saa polussa olevan id-numeron Railsin määrittelemältä
+\texttt{params}-oliolta kutsulla \texttt{params[:id]}.
+
+Id-numero annetaan parametriksi \texttt{Project.find}-kutsulle, joka noutaa
+tietokannasta numeroa vastaavan olion. Se sijoitetaan
+\texttt{@projects}-jäsenmuuttujaan näkymää varten.
+
+\begin{samepage}
+Yksinkertaista \texttt{show}-metodi
+\myref{kuvan}{fig:projects-controller-01-show} mukaiseen muotoon.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{show}-metodi yksinkertaisempana}
+\label{fig:projects-controller-01-show}
+
+\begin{pygmented}{ruby}
+  # GET /projects/1
+  def show
+    @project = Project.find(params[:id])
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Rails renderöi automaattisesti \texttt{projects/show}-näkymän, joka on
+\myref{kuvan}{fig:projects-show-view-00} mukainen.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/projects/show.html.erb}}
+\label{fig:projects-show-view-00}
+
+\begin{pygmented}{html+erb}
+<p><b>Name:</b> <%= @project.name %></p>
+
+<p><b>What:</b> <%= @project.what %></p>
+
+<p><b>When:</b> <%= @project.when %></p>
+
+<p><b>Why:</b> <%= @project.why %></p>
+
+
+<%= link_to 'Edit', edit_project_path(@project) %> |
+<%= link_to 'Back', projects_path %>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\subsubsection{\eng{Controller} ja \eng{View}: \texttt{new}}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-controller-00-new} listaa projects-ohjaimen
+\texttt{new}-metodin. Rails kutsuu sitä, kun käyttäjä tekee \texttt{GET}-kutsun
+\texttt{/projects/new}-resurssille.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}: \texttt{new}-metodi}
+\label{fig:projects-controller-00-new}
+
+\begin{pygmented}{ruby}
+  # GET /projects/new
+  # GET /projects/new.xml
+  def new
+    @project = Project.new
+
+    respond_to do |format|
+      format.html # new.html.erb
+      format.xml  { render :xml => @project }
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Metodi muodostaa tyhjän \texttt{Project}-mallin olion kutsulla
+\texttt{Project.new}. Kutsu ei tee tietokantaan mitään muutoksia, mutta luo
+olion, jonka attribuutteja voitaisiin halutessa muokata ja joka voitaisiin
+halutessa tallentaa tietokantaan. Olio sijoitetaan
+\texttt{@project}-jäsenmuuttujaan näkymää varten.
+
+\begin{samepage}
+Yksinkertaista \texttt{new}-metodi
+\myref{kuvan}{fig:projects-controller-01-new} mukaiseen muotoon.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}: \texttt{new}-metodi
+yksinkertaisempana}
+\label{fig:projects-controller-01-new}
+
+\begin{pygmented}{ruby}
+  # GET /projects/new
+  def new
+    @project = Project.new
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Rails renderöi automaattisesti \texttt{project/new}-näkymän, joka on
+\myref{kuvan}{fig:projects-new-view-00} mukainen.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/projects/new.html.erb}}
+\label{fig:projects-new-view-00}
+
+\begin{pygmented}{html+erb}
+<h1>New project</h1>
+
+<%= render 'form' %>
+
+<%= link_to 'Back', projects_path %>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Tässä hyödynnetään Railsin \eng{partials}-toimintoa. Koska uutta projektia
+luodessa ja olemassa olevaa muokatessa HTML-lomake on käytännössä identtinen,
+varsinainen lomake voidaan sijoittaa omaan tiedostoonsa, joka renderöidään
+\texttt{render}-kutsulla kummastakin sivusta.
+
+\begin{samepage}
+\texttt{form}-\eng{partial} on \myref{kuvan}{fig:projects-form-partial-00}
+mukainen. Huomaa tiedostonimen edessä oleva alaviiva, joka merkitsee partialia.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/projects/\_form.html.erb}}
+\label{fig:projects-form-partial-00}
+
+\begin{pygmented}{html+erb}
+<% form_for(@project) do |f| %>
+  <%= f.error_messages %>
+
+  <div class="field"><%= f.label :name %><br /><%= f.text_field :name %></div>
+  <div class="field"><%= f.label :what %><br /><%= f.text_area :what %></div>
+  <div class="field"><%= f.label :when %><br /><%= f.text_area :when %></div>
+  <div class="field"><%= f.label :why %><br /><%= f.text_area :why %></div>
+  <div class="actions"><%= f.submit %></div>
+<% end %>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\texttt{form\_for} on Railsin metodi, joka helpottaa HTML-lomakkeiden
+renderöintiä mallin (\eng{model}) perusteella.
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-new-view-00-example} listaa esimerkin näkymän
+muodostamasta HTML:stä.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/projects/\_form.html.erb}: Esimerkkituloste}
+\label{fig:projects-new-view-00-example}
+
+\begin{pygmented}{html}
+<form action="/projects" class="new_project" id="new_project" method="post">
+  <input name="authenticity_token" type="hidden" value="EihD8pZXpR4nUnuxRu0Cmsw3EC3J9clhjgCyFJcuCYA=" />
+
+  <div class="field">
+    <label for="project_name">Name</label><br />
+    <input id="project_name" name="project[name]" size="30" type="text" />
+  </div>
+  <div class="field">
+    <label for="project_what">What</label><br />
+    <textarea cols="40" id="project_what" name="project[what]" rows="20"></textarea>
+  </div>
+  <div class="field">
+    <label for="project_when">When</label><br />
+    <textarea cols="40" id="project_when" name="project[when]" rows="20"></textarea>
+  </div>
+  <div class="field">
+    <label for="project_why">Why</label><br />
+    <textarea cols="40" id="project_why" name="project[why]" rows="20"></textarea>
+  </div>
+  <div class="actions">
+    <input id="project_submit" name="commit" type="submit" value="Create Project" />
+  </div>
+</form>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\texttt{form\_for}-\emph{/eng{helper}} generoi automaattisesti
+\texttt{authenticity\_token}-kentän lomakkeeseen. Rails tarkistaa kyseisen
+parametrin arvon jokaisen \texttt{POST}-, \texttt{PUT}- ja \texttt{DELETE}
+-pyynnön yhteydessä
+CSRF-haavoittuvuuden\footnote{\url{http://en.wikipedia.org/wiki/Cross-site\_request\_forgery}}
+välttämiseksi.
+
+\subsubsection{\eng{Controller} ja \eng{View}: \texttt{edit}}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-controller-00-edit} listaa projects-ohjaimen
+\texttt{edit}-metodin. Rails kutsuu sitä, kun käyttäjä tekee
+\texttt{GET}-kutsun \texttt{/projects/N/edit}-resurssille, jossa \texttt{N} on
+projektin id-numero.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{edit}-metodi}
+\label{fig:projects-controller-00-edit}
+
+\begin{pygmented}{ruby}
+  # GET /projects/1/edit
+  def edit
+    @project = Project.find(params[:id])
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Metodi noutaa tietokannasta polussa olevan id-numeron mukaisen
+\texttt{Project}-mallin olion.
+
+\begin{samepage}
+Rails renderöi automaattisesti \texttt{project/edit}-näkymän, joka on
+\myref{kuvan}{fig:projects-edit-view-00} mukainen.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/projects/edit.html.erb}}
+\label{fig:projects-edit-view-00}
+
+\begin{pygmented}{html+erb}
+<h1>Editing project</h1>
+
+<%= render 'form' %>
+
+<%= link_to 'Show', @project %> |
+<%= link_to 'Back', projects_path %>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Näkymä renderöi \texttt{form}-partialin, jonka sisältö näytettiin
+\myref{kuvassa}{fig:projects-form-partial-00}.
+
+\subsubsection{\eng{Controller} ja \eng{View}: \texttt{create}}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-controller-00-create} listaa projects-ohjaimen
+\texttt{create}-metodin. Rails kutsuu sitä, kun käyttäjä tekee
+\texttt{POST}-kutsun \texttt{/projects}-resurssille.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{create}-metodi}
+\label{fig:projects-controller-00-create}
+
+\begin{pygmented}{ruby}
+  # POST /projects
+  # POST /projects.xml
+  def create
+    @project = Project.new(params[:project])
+
+    respond_to do |format|
+      if @project.save
+        format.html { redirect_to(@project, :notice => 'Project was successfully created.') }
+        format.xml  { render :xml => @project, :status => :created, :location => @project }
+      else
+        format.html { render :action => "new" }
+        format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Yksinkertaista \texttt{create}-metodi
+\myref{kuvan}{fig:projects-controller-01-create} mukaiseen muotoon.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{create}-metodi yksinkertaisempana}
+\label{fig:projects-controller-01-create}
+
+\begin{pygmented}{ruby}
+  # POST /projects
+  def create
+    @project = Project.new(params[:project])
+
+    if @project.save
+      redirect_to(@project, :notice => 'Project was successfully created.')
+    else
+      render :action => "new"
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Metodi muodostaa uuden \texttt{Project}-mallin olion täydentäen sen kentät
+käyttäjältä tulevien parametrien perusteella. Olio sijoitetaan
+\texttt{@project}-jäsenmuuttujaan.
+
+Mikäli olion tallentaminen tietokantaan \texttt{@project.save}-kutsulla
+onnistuu, käyttäjän sessioon lisätään viesti onnistuneesta luonnista ja selain
+ohjataan juuri luodun projektin sivulle, joka tulee näyttämään viestin.
+
+Mikäli tallentaminen epäonnistuu, käyttäjälle renderöidään
+\texttt{projects/new}-näkymä. Näkymää renderöidessä \texttt{@project} sisältää
+attribuutit käyttäjän antamassa muodossa, sekä listan virheistä. Näin
+\texttt{projects/\_form}-\eng{partial} säilyttää kentissä käyttäjän jo
+syöttämät arvot ja kertoo epäonnistumisen syyt.
+
+\subsubsection{\eng{Controller} ja \eng{View}: \texttt{update}}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-controller-00-update} listaa projects-ohjaimen
+\texttt{update}-metodin. Rails kutsuu sitä, kun käyttäjä tekee
+\texttt{PUT}-kutsun \texttt{/projects/N}-resurssille, jossa \texttt{N} on
+projektin id-numero.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{update}-metodi}
+\label{fig:projects-controller-00-update}
+
+\begin{pygmented}{ruby}
+  # PUT /projects/1
+  # PUT /projects/1.xml
+  def update
+    @project = Project.find(params[:id])
+
+    respond_to do |format|
+      if @project.update_attributes(params[:project])
+        format.html { redirect_to(@project, :notice => 'Project was successfully updated.') }
+        format.xml  { head :ok }
+      else
+        format.html { render :action => "edit" }
+        format.xml  { render :xml => @project.errors, :status => :unprocessable_entity }
+      end
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Yksinkertaista \texttt{update}-metodi
+\myref{kuvan}{fig:projects-controller-01-update} mukaiseen muotoon.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{update}-metodi yksinkertaisempana}
+\label{fig:projects-controller-01-update}
+
+\begin{pygmented}{ruby}
+  # PUT /projects/1
+  def update
+    @project = Project.find(params[:id])
+
+    if @project.update_attributes(params[:project])
+      redirect_to(@project, :notice => 'Project was successfully updated.')
+    else
+      render :action => "edit"
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Metodi noutaa tietokannasta polussa olevan id-numeron mukaisen
+\texttt{Project}-mallin olion ja sijoittaa sen
+\texttt{@project}-jäsenmuuttujaan.
+
+Mikäli olion attribuuttien päivittäminen käyttäjältä tulevien parametrien
+perusteella sekä olion tallentaminen tietokantaan
+\texttt{@project.update\_attributes}-kutsulla onnistuu, käyttäjän sessioon
+lisätään viesti onnistuneesta päivityksestä ja selain ohjataan juuri päivitetyn
+projektin sivulle, joka tulee näyttämään viestin.
+
+Mikäli päivitys epäonnistuu, käyttäjälle renderöidään
+\texttt{projects/edit}-näkymä. Näkymää renderöidessä \texttt{@project} sisältää
+attribuutit käyttäjän antamassa muodossa, sekä listan virheistä. Näin
+\texttt{projects/\_form}-\eng{partial} säilyttää kentissä käyttäjän jo
+syöttämät arvot ja kertoo epäonnistumisen syyt.
+
+\subsubsection{\eng{Controller} ja \eng{View}: \texttt{destroy}}
+
+\begin{samepage}
+\myref{Kuva}{fig:projects-controller-00-destroy} listaa projects-ohjaimen
+\texttt{destroy}-metodin. Rails kutsuu sitä, kun käyttäjä tekee
+\texttt{DELETE}-kutsun \texttt{/projects/N}-resurssille, jossa \texttt{N} on
+projektin id-numero.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{destroy}-metodi}
+\label{fig:projects-controller-00-destroy}
+
+\begin{pygmented}{ruby}
+  # DELETE /projects/1
+  # DELETE /projects/1.xml
+  def destroy
+    @project = Project.find(params[:id])
+    @project.destroy
+
+    respond_to do |format|
+      format.html { redirect_to(projects_url) }
+      format.xml  { head :ok }
+    end
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Yksinkertaista \texttt{destroy}-metodi
+\myref{kuvan}{fig:projects-controller-01-destroy} mukaiseen muotoon.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{destroy}-metodi yksinkertaisempana}
+\label{fig:projects-controller-01-destroy}
+
+\begin{pygmented}{ruby}
+  # DELETE /projects/1
+  def destroy
+    @project = Project.find(params[:id])
+    @project.destroy
+
+    redirect_to(projects_url)
+  end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Metodi noutaa tietokannasta polussa olevan id-numeron mukaisen
+\texttt{Project}-mallin olion ja sijoittaa sen
+\texttt{@project}-jäsenmuuttujaan. Tietokannan rivi tuhotaan
+\texttt{@project.destroy}-kutsulla.
+
+Lopuksi selain ohjataan projektilistaan.
+
+\subsubsection{\eng{Layout}}
+
+Yllä esitellyt näkymät tarvivat ympärilleen varsinaisen HTML-sivun. Tämän
+tehtävän hoitaa \eng{layout}.
+
+\begin{samepage}
+\eng{Scaffold}-generaattori loi tiedoston
+\texttt{app/views/layouts/projects.html.erb} layoutiksi projects-ohjaimelle,
+mutta luomme sen sijaan globaalin
+\texttt{app/views/layouts/application.html.erb}-tiedoston mukaillen
+\texttt{projects.html.erb}:tä \myref{kuvan}{fig:application-layout-00}
+mukaisesti.
+
+\begin{myfigure}[H]
+\caption{\texttt{app/views/layouts/application.html.erb}}
+\label{fig:application-layout-00}
+
+\begin{pygmented}{html+erb}
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= controller.action_name %> &ndash; <%= controller.controller_name %> &ndash; 5w</title>
+  <%= javascript_include_tag 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js' %>
+  <%= javascript_include_tag 'rails', :cache => true %>
+  <%= csrf_meta_tag %>
+</head>
+<body>
+
+<p class="notice"><%= notice %></p>
+
+<%= yield %>
+
+</body>
+</html>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Tuhoa \texttt{projects.html.erb}-layout. Tuhoa myös
+\eng{scaffold}-generaattorin luoma tiedosto
+\texttt{public/stylesheets/scaffold.css}. Tulemme määrittelemään itse kaiken
+ulkoasun.
+
+Imuroi lisäksi \texttt{public/javascripts}-hakemistoon jQuery-UJS-projektin
+tiedosto \texttt{rails.js}. Se toteuttaa Railsin JavaScript-toiminnot jQueryn
+kanssa. Yllä oleva \texttt{application.html.erb} viittaa siihen.
+
+\begin{pygmented}{console}
+% rm app/views/layouts/projects.html.erb public/stylesheets/scaffold.css
+% mkdir public/javascripts
+% wget -O public/javascripts/rails.js http://github.com/rails/jquery-ujs/raw/master/src/rails.js
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Tee commit layoutin ja \texttt{rails.js}:n lisäämisestä.
+
+\begin{pygmented}{console}
+% git add app/views/layouts/application.html.erb public
+% git commit -m 'Add initial layout and jQuery-UJS'
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Tee vielä commit projects-scaffoldingista.
+
+\begin{pygmented}{console}
+% git add .
+% git commit -m 'Add initial projects scaffolding'
+\end{pygmented}
+\end{samepage}
+
+\subsubsection{Yksikkötestit}
+
+TODO
+
+\paragraph{spec/models/project\_spec.rb}
+\paragraph{spec/controllers/projects\_controller\_spec.rb}
+\paragraph{spec/views/projects/index.html.erb\_spec.rb}
+\paragraph{spec/views/projects/show.html.erb\_spec.rb}
+\paragraph{spec/views/projects/new.html.erb\_spec.rb}
+\paragraph{spec/views/projects/edit.html.erb\_spec.rb}
+\paragraph{spec/requests/projects\_spec.rb}
+
 \end{document}
 
 % vim:set et sw=2 sts=2:
