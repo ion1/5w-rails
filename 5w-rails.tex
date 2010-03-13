@@ -169,6 +169,9 @@ Jos olet käyttämässä Git-versionhallintaa ensimmäistä kertaa, katso
 \myref{kuva}{fig:git-initial-config}.
 
 \begin{myfigure}
+\caption{Perusasetuksien teko ensimmäisellä Git-käyttökerralla}
+\label{fig:git-initial-config}
+
 \begin{pygmented}{console}
 % git config --global user.name 'Etunimi Sukunimi'
 % git config --global user.email 'user@example.net'
@@ -176,8 +179,6 @@ Jos olet käyttämässä Git-versionhallintaa ensimmäistä kertaa, katso
 >   git config --global "color.$n" auto
 > done
 \end{pygmented}
-\caption{Perusasetuksien teko ensimmäisellä Git-käyttökerralla}
-\label{fig:git-initial-config}
 \end{myfigure}
 
 \begin{samepage}
@@ -317,9 +318,10 @@ Luo editorissa tiedosto \texttt{features/manage\_projects.feature}
 (\myref{kuva}{fig:manage-projects-feature}).
 
 \begin{myfigure}
-\includecode{include/manage_projects-00.feature}
 \caption{\texttt{features/manage\_projects.feature}}
 \label{fig:manage-projects-feature}
+
+\includecode{include/manage_projects-00.feature}
 \end{myfigure}
 
 Esimerkin alussa oleva ''@wip'' (''\eng{work in progress}'') on tagi, jonka
@@ -458,7 +460,9 @@ delete}\footnote{\url{http://en.wikipedia.org/wiki/Create,\_read,\_update\_and\_
 
 \begin{myfigure}
 \centering
-\begin{english}
+\caption{CRUD-verbit eräissä syntakseissa}
+\label{fig:crud}
+
 \begin{tabular}{|c|c|c|}
 \hline
        & SQL    & HTTP   \\
@@ -469,9 +473,6 @@ Update & UPDATE & PUT    \\
 Delete & DELETE & DELETE \\
 \hline
 \end{tabular}
-\end{english}
-\caption{CRUD-verbit eräissä syntakseissa}
-\label{fig:crud}
 \end{myfigure}
 
 \begin{samepage}
