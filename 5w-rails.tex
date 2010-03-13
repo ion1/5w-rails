@@ -2,6 +2,7 @@
 \usepackage[english,finnish]{babel}
 \usepackage[utf8]{inputenc}
 
+\usepackage{float}
 \usepackage[a4paper,margin=2cm]{geometry}
 \usepackage[colorlinks=true]{hyperref}
 \usepackage{xcolor}
@@ -14,17 +15,19 @@
 \setlength{\parindent}{0pt}
 
 \newsavebox{\myfigurebox}
-\newenvironment{myfigure}{
-  \begin{figure}
+\makeatletter
+\newenvironment{myfigure}[1][tbp]{
+  \begin{figure}[#1]
     \centering
     \begin{lrbox}{\myfigurebox}
-      \begin{minipage}{0.8\textwidth}
+      \begin{minipage}{\textwidth}
 }{
       \end{minipage}
     \end{lrbox}
-    \fcolorbox{blue}{blue!1}{\usebox{\myfigurebox}}
+    \colorbox{blue!4}{\usebox{\myfigurebox}}
   \end{figure}
 }
+\makeatother
 
 \newcommand{\myref}[2]{\hyperref[#2]{#1~\ref*{#2}}}
 
