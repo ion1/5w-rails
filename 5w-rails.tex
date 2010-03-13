@@ -418,18 +418,14 @@ yksityiskohdat.
 \begin{samepage}
 Kiinnitä huomio seuraaviin esimerkkeihin HTTP-pyynnöistä.
 
-\begin{english}
-\begin{tabular}{|r|l|}
+\begin{tabular}{rl}
+Metodi      & Polku                      \\
 \hline
-Method & Path                \\
-\hline
-POST   & /projects/create    \\
-GET    & /projects/42        \\
-POST   & /projects/update/42 \\
-POST   & /projects/delete/42 \\
-\hline
+\verb!POST! & \verb!/projects/create!    \\
+\verb!GET!  & \verb!/projects/42!        \\
+\verb!POST! & \verb!/projects/update/42! \\
+\verb!POST! & \verb!/projects/delete/42! \\
 \end{tabular}
-\end{english}
 \end{samepage}
 
 Ensinnäkin on havaittavissa toistoa: pyynnöissä on verbejä (\eng{create,
@@ -441,18 +437,14 @@ Lisäksi jos hyödyntäisimme HTTP-verbejä kyseisissä pyynnöissä, samaa resu
 käsittelevien pyyntöjen polut muuttuisivat samoiksi; tässä voi havaita tiettyä
 eleganssia.
 
-\begin{english}
-\begin{tabular}{|r|l|}
+\begin{tabular}{rl}
+Metodi        & Polku               \\
 \hline
-Method & Path         \\
-\hline
-POST   & /projects    \\
-GET    & /projects/42 \\
-PUT    & /projects/42 \\
-DELETE & /projects/42 \\
-\hline
+\verb!POST!   & \verb!/projects!    \\
+\verb!GET!    & \verb!/projects/42! \\
+\verb!PUT!    & \verb!/projects/42! \\
+\verb!DELETE! & \verb!/projects/42! \\
 \end{tabular}
-\end{english}
 \end{samepage}
 
 Kyseisistä neljästä verbistä käytetään termiä \eng{CRUD -- create, read,
@@ -465,15 +457,13 @@ delete}\footnote{\url{http://en.wikipedia.org/wiki/Create,\_read,\_update\_and\_
 \caption{CRUD-verbit eräissä syntakseissa}
 \label{fig:crud}
 
-\begin{tabular}{|c|c|c|}
-\hline
+\begin{tabular}{ccc}
        & SQL    & HTTP   \\
 \hline
 Create & INSERT & POST   \\
 Read   & SELECT & GET    \\
 Update & UPDATE & PUT    \\
 Delete & DELETE & DELETE \\
-\hline
 \end{tabular}
 \end{myfigure}
 
@@ -481,19 +471,15 @@ Delete & DELETE & DELETE \\
 Mitä käytännön hyötyä on saavutettu? Ei oikeastaan vielä mitään merkittävää.
 Hyötyjä havainnollistetaan seuraavalla esimerkillä.
 
-\begin{english}
-\begin{tabular}{|r|l|l|}
+\begin{tabular}{rll}
+Metodi      & Polku                           & Sisältö (\eng{body}) \\
 \hline
-Method & Path                      & Body           \\
+\verb!POST! & \verb!/projects/42/add_user!    & \verb!user_id=5!     \\
+\verb!POST! & \verb!/projects/42/delete_user! & \verb!user_id=5!     \\
 \hline
-POST   & /projects/42/add\_user    & user\_id=5     \\
-POST   & /projects/42/delete\_user & user\_id=5     \\
-\hline
-POST   & /users/5/join\_project    & project\_id=42 \\
-POST   & /users/5/leave\_project   & project\_id=42 \\
-\hline
+\verb!POST! & \verb!/users/5/join_project!    & \verb!project_id=42! \\
+\verb!POST! & \verb!/users/5/leave_project!   & \verb!project_id=42! \\
 \end{tabular}
-\end{english}
 \end{samepage}
 
 Kumpaan ohjaimeen käyttäjän liittäminen projektiin kuuluu -- projektit vai
@@ -515,17 +501,13 @@ Nyt projektiin liittyminen ja siitä poistuminen muuttuu jäsenyyden luomiseksi
 jäsenyyden päivittämiseksi (\eng{update}). Pyynnöt käsittelee
 \texttt{project\_memberships}-ohjain.
 
-\begin{english}
-\begin{tabular}{|r|l|l|}
+\begin{tabular}{rll}
+Metodi        & Polku                         & Sisältö (\eng{body})                 \\
 \hline
-Method & Path                    & Body                              \\
-\hline
-POST   & /project\_memberships   & user\_id=5\&project\_id=42\&role= \\
-PUT    & /project\_memberships/9 & role=Moral support                \\
-DELETE & /project\_memberships/9 &                                   \\
-\hline
+\verb!POST!   & \verb!/project_memberships!   & \verb!user_id=5&project_id=42&role=! \\
+\verb!PUT!    & \verb!/project_memberships/9! & \verb!role=Moral+support!            \\
+\verb!DELETE! & \verb!/project_memberships/9! &                                      \\
 \end{tabular}
-\end{english}
 \end{samepage}
 
 Rails tekee CRUD-toimintamallin noudattamisen hyvin helpoksi, kuten myöhemmin
