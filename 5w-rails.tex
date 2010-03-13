@@ -147,13 +147,14 @@ että vain jälkimmäinen päätyy versionhallintaan.
 \end{pygmented}
 \end{samepage}
 
-Rails ylläpitää tiedostossa db/schema.rb kuvausta tietokannan skeemasta.
-Sovelluksen päivityksen yhteydessä Railsin migrations-toiminto hoitaa olemassa
-olevan tietokannan päivittämisen uuden koodin kanssa yhteensopivaksi, mutta
-uudet tietokannat alustetaan suoraan kyseisen tiedoston perusteella.
+Rails ylläpitää tiedostossa \texttt{db/schema.rb} kuvausta tietokannan
+skeemasta. Sovelluksen päivityksen yhteydessä Railsin migrations-toiminto
+hoitaa olemassa olevan tietokannan päivittämisen uuden koodin kanssa
+yhteensopivaksi, mutta uudet tietokannat alustetaan suoraan kyseisen tiedoston
+perusteella.
 
 \begin{samepage}
-Jotta db/schema.rb:n lisääminen versionhallintaan ei pääse myöhemmin
+Jotta \texttt{db/schema.rb}:n lisääminen versionhallintaan ei pääse myöhemmin
 unohtumaan, luodaan sen ensimmäinen (tyhjä) versio heti seuraavaa committia
 varten Rake-komennolla \texttt{db:migrate}.
 
@@ -312,12 +313,12 @@ Asenna Cucumberin projektikohtaiset tiedostot.
 
 \subsection{Ensimmäinen integraatiotesti: \eng{Manage projects}}
 
-Luo editorissa tiedosto features/manage\_projects.feature
+Luo editorissa tiedosto \texttt{features/manage\_projects.feature}
 (\myref{kuva}{fig:manage-projects-feature}).
 
 \begin{myfigure}
 \includecode{include/manage_projects-00.feature}
-\caption{features/manage\_projects.feature}
+\caption{\texttt{features/manage\_projects.feature}}
 \label{fig:manage-projects-feature}
 \end{myfigure}
 
@@ -509,7 +510,7 @@ väliselle relaatiolle nimen: \emph{\eng{project memberships}}.
 Nyt projektiin liittyminen ja siitä poistuminen muuttuu jäsenyyden luomiseksi
 (\eng{create}) ja poistamiseksi (\eng{delete}), ja roolin muuttaminen muuttuu
 jäsenyyden päivittämiseksi (\eng{update}). Pyynnöt käsittelee
-\eng{project\_memberships}-ohjain.
+\texttt{project\_memberships}-ohjain.
 
 \begin{english}
 \begin{tabular}{|r|l|l|}
