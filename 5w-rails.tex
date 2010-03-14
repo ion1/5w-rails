@@ -987,6 +987,7 @@ Rails renderöi automaattisesti \texttt{projects/show}-näkymän, joka on
 \end{samepage}
 
 \subsubsection{\eng{Controller} ja \eng{View}: \texttt{new}}
+\label{sec:projects-controller-00-new}
 
 \begin{samepage}
 \myref{Kuva}{fig:projects-controller-00-new} listaa projects-ohjaimen
@@ -1396,6 +1397,25 @@ mukaisesti.
 \end{myfigure}
 \end{samepage}
 
+\texttt{controller.action\_name}- ja \texttt{controller.controller\_name}
+-metodien käyttö sivun otsikossa saa aikaan otsikon tyyliin ''index -- projects
+-- 5w''. Tämä on väliaikainen otsikko, joka tullaan muuttamaan paremmaksi
+aikanaan.
+
+\texttt{javascript\_include\_tag}-kutsut muodostavat \texttt{script}-tagit,
+joiden perusteella selain lataa jQuery-kirjaston Googlen palvelusta ja
+jQuery-UJS-projektin \texttt{rails.js}-tiedoston palvelimeltamme. Jälkimmäinen
+toteuttaa Railsin JavaScript-toiminnot jQueryn kanssa.
+
+\texttt{csrf\_meta\_tag}-kutsu lisää sivuun metadataa, jonka perusteella
+JavaScript-koodi (kuten \texttt{rails.js}) kykenee tarvittaessa olemaan
+yhteensopiva \myref{kappaleessa}{sec:projects-controller-00-new} mainitun
+CSRF-suojauksen kanssa.
+
+\texttt{notice}-kutsu lisää sivulle mahdollisen käyttäjän sessioon lisätyn
+viestin, kuten ''Project created''. \texttt{yield}-kutsu taas saa aikaan
+varsinaisen näkymän renderöinnin kyseiseen kohtaan layoutia.
+
 \begin{samepage}
 Tuhoa \texttt{projects.html.erb}-layout. Tuhoa myös
 \eng{scaffold}-generaattorin luoma tiedosto
@@ -1408,12 +1428,11 @@ ulkoasun.
 \end{samepage}
 
 \begin{samepage}
-Imuroi lisäksi \texttt{public/javascripts}-hakemistoon jQuery-UJS-projektin
-tiedosto \texttt{rails.js}. Se toteuttaa Railsin JavaScript-toiminnot jQueryn
-kanssa. Yllä oleva \texttt{application.html.erb} viittaa siihen.
+Imuroi \texttt{public/javascripts}-hakemistoon yllä mainittu
+jQuery-UJS-projektin tiedosto \texttt{rails.js}.
 
 \begin{pygmented}{console}
-% mkdir public/javascripts
+% mkdir -p public/javascripts
 % wget -O public/javascripts/rails.js http://github.com/rails/jquery-ujs/raw/master/src/rails.js
 \end{pygmented}
 \end{samepage}
