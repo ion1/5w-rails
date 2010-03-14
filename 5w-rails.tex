@@ -1446,6 +1446,76 @@ Tee commit layoutin ja \texttt{rails.js}:n lisäämisestä.
 \end{pygmented}
 \end{samepage}
 
+\subsubsection{Yksikkötestit}
+
+\begin{samepage}
+\eng{Scaffold}-generaattori loi \texttt{spec}-hakemiston alle alustavia
+tiedostoja yksikkötestausta varten. Tutustumme niihin tarkemmin siinä
+vaiheessa, kun teemme ensimmäisiä yksikkötestejä. Poista kuitenkin alustavat
+\eng{request}- ja \eng{view} -testit tässä vaiheessa, koska Cucumber-speksimme
+testaa ja tulee testaamaan samat asiat.
+
+\begin{pygmented}{console}
+% rm -r spec/requests/projects_spec.rb spec/views/projects
+\end{pygmented}
+\end{samepage}
+
+\subsubsection{Cucumber-testien ajo ja commit}
+
+\begin{samepage}
+Jotta pääsemme Cucumber-speksissämme eteenpäin, joudumme tekemään vielä yhden
+asian. Tarkka virheilmoitus oli:
+
+\begin{pygmented}{console}
+      Can't find mapping from "the New Project page" to a path.
+      Now, go and add a mapping in features/support/paths.rb (RuntimeError)
+\end{pygmented}
+\end{samepage}
+
+Cucumber ei tiedä, mitä polkua ''\eng{the New Project page}'' merkitsee.
+Voisimme kertoa sille, että polku on \texttt{/projects/new}, mutta on parempi
+käyttää \texttt{new\_project\_path}-metodia, jonka opimme
+\myref{kappaleessa}{sec:projects-routing}.
+
+\begin{samepage}
+Tee \texttt{features/support/paths.rb}-tiedostoon
+\myref{kuvan}{fig:paths-new-project} mukainen muutos.
+
+\begin{myfigure}[H]
+\caption{\texttt{features/support/paths.rb}: ''\eng{the New Project page}''}
+\label{fig:paths-new-project}
+
+\begin{pygmented}{diff}
+--- a/features/support/paths.rb
++++ b/features/support/paths.rb
+@@ -17,6 +17,9 @@ module NavigationHelpers
+     #   when /^(.*)'s profile page$/i
+     #     user_profile_path(User.find_by_login($1))
+ 
++    when 'the New Project page'
++      new_project_path
++
+     else
+       raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
+         "Now, go and add a mapping in #{__FILE__}"
+\end{pygmented}
+
+(Huomaa diff-formaatti. Sanavälillä alkavat rivit ovat tiedostossa jo olevaa
+sisältöä kontekstina, plus-merkillä alkavat rivit ovat kyseisiin väleihin
+lisättäviä rivejä.)
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Nyt kun ajamme Rake-komennon \texttt{cucumber:wip}, pääsemme testeissä
+eteenpäin ja Cucumber kertoo ensimmäisen virheilmoituksen muodossa, mitä tulee
+tehdä seuraavaksi.
+
+\begin{pygmented}{console}
+% rake cucumber:wip
+\end{pygmented}
+\end{samepage}
+
 \begin{samepage}
 Tee vielä commit projects-scaffoldingista.
 
@@ -1454,18 +1524,6 @@ Tee vielä commit projects-scaffoldingista.
 % git commit -m 'Add initial projects scaffolding'
 \end{pygmented}
 \end{samepage}
-
-\subsubsection{Yksikkötestit}
-
-TODO
-
-\paragraph{spec/models/project\_spec.rb}
-\paragraph{spec/controllers/projects\_controller\_spec.rb}
-\paragraph{spec/views/projects/index.html.erb\_spec.rb}
-\paragraph{spec/views/projects/show.html.erb\_spec.rb}
-\paragraph{spec/views/projects/new.html.erb\_spec.rb}
-\paragraph{spec/views/projects/edit.html.erb\_spec.rb}
-\paragraph{spec/requests/projects\_spec.rb}
 
 \end{document}
 
