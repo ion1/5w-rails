@@ -778,6 +778,17 @@ Kutsu                                    & Palautettu merkkijono                
     end
   end
 \end{pygmented}
+
+\caption{\texttt{app/controllers/projects\_controller.rb}:
+\texttt{index}-metodi yksinkertaisempana}
+\label{fig:projects-controller-01-index}
+
+\begin{pygmented}{ruby}
+  # GET /projects
+  def index
+    @projects = Project.scoped
+  end
+\end{pygmented}
 \end{myfigure}
 \end{samepage}
 
@@ -792,25 +803,10 @@ XML:n, joista jälkimmäinen soveltuu ohjelmallisen web-rajapinnan tarjoamiseen.
 Listassa voisi olla esim. JSON ja Atom, mikäli haluamme tarjota JSON-rajapinnan
 sekä Atom-syötteen.
 
-\begin{samepage}
 Tutustumme myöhemmin vaihtoehtoisten formaattien tarjoamiseen, mutta tuemme
 tässä vaiheessa vain HTML:ää yksinkertaisuuden nimissä. Muuta
 \texttt{index}-metodi \myref{kuvan}{fig:projects-controller-01-index} mukaiseen
 muotoon.
-
-\begin{myfigure}[H]
-\caption{\texttt{app/controllers/projects\_controller.rb}:
-\texttt{index}-metodi yksinkertaisempana}
-\label{fig:projects-controller-01-index}
-
-\begin{pygmented}{ruby}
-  # GET /projects
-  def index
-    @projects = Project.scoped
-  end
-\end{pygmented}
-\end{myfigure}
-\end{samepage}
 
 Muutimme samalla \texttt{Project.all}-kutsun \texttt{Project.scoped}-kutsuksi.
 Ensimmäinen tekee välittömästi tietokantahaun ja palauttaa taulukon,
@@ -942,21 +938,7 @@ projektin id-numero.
     end
   end
 \end{pygmented}
-\end{myfigure}
-\end{samepage}
 
-Metodi saa polussa olevan id-numeron Railsin määrittelemältä
-\texttt{params}-oliolta kutsulla \texttt{params[:id]}.
-
-Id-numero annetaan parametriksi \texttt{Project.find}-kutsulle, joka noutaa
-tietokannasta numeroa vastaavan olion. Se sijoitetaan
-\texttt{@projects}-jäsenmuuttujaan näkymää varten.
-
-\begin{samepage}
-Yksinkertaista \texttt{show}-metodi
-\myref{kuvan}{fig:projects-controller-01-show} mukaiseen muotoon.
-
-\begin{myfigure}[H]
 \caption{\texttt{app/controllers/projects\_controller.rb}:
 \texttt{show}-metodi yksinkertaisempana}
 \label{fig:projects-controller-01-show}
@@ -969,6 +951,16 @@ Yksinkertaista \texttt{show}-metodi
 \end{pygmented}
 \end{myfigure}
 \end{samepage}
+
+Metodi saa polussa olevan id-numeron Railsin määrittelemältä
+\texttt{params}-oliolta kutsulla \texttt{params[:id]}.
+
+Id-numero annetaan parametriksi \texttt{Project.find}-kutsulle, joka noutaa
+tietokannasta numeroa vastaavan olion. Se sijoitetaan
+\texttt{@projects}-jäsenmuuttujaan näkymää varten.
+
+Yksinkertaista \texttt{show}-metodi
+\myref{kuvan}{fig:projects-controller-01-show} mukaiseen muotoon.
 
 \begin{samepage}
 Rails renderöi automaattisesti \texttt{projects/show}-näkymän, joka on
@@ -1017,20 +1009,7 @@ Rails renderöi automaattisesti \texttt{projects/show}-näkymän, joka on
     end
   end
 \end{pygmented}
-\end{myfigure}
-\end{samepage}
 
-Metodi muodostaa tyhjän \texttt{Project}-mallin olion kutsulla
-\texttt{Project.new}. Kutsu ei tee tietokantaan mitään muutoksia, mutta luo
-olion, jonka attribuutteja voitaisiin halutessa muokata ja joka voitaisiin
-halutessa tallentaa tietokantaan. Olio sijoitetaan
-\texttt{@project}-jäsenmuuttujaan näkymää varten.
-
-\begin{samepage}
-Yksinkertaista \texttt{new}-metodi
-\myref{kuvan}{fig:projects-controller-01-new} mukaiseen muotoon.
-
-\begin{myfigure}[H]
 \caption{\texttt{app/controllers/projects\_controller.rb}: \texttt{new}-metodi
 yksinkertaisempana}
 \label{fig:projects-controller-01-new}
@@ -1043,6 +1022,15 @@ yksinkertaisempana}
 \end{pygmented}
 \end{myfigure}
 \end{samepage}
+
+Metodi muodostaa tyhjän \texttt{Project}-mallin olion kutsulla
+\texttt{Project.new}. Kutsu ei tee tietokantaan mitään muutoksia, mutta luo
+olion, jonka attribuutteja voitaisiin halutessa muokata ja joka voitaisiin
+halutessa tallentaa tietokantaan. Olio sijoitetaan
+\texttt{@project}-jäsenmuuttujaan näkymää varten.
+
+Yksinkertaista \texttt{new}-metodi
+\myref{kuvan}{fig:projects-controller-01-new} mukaiseen muotoon.
 
 \begin{samepage}
 Rails renderöi automaattisesti \texttt{project/new}-näkymän, joka on
@@ -1211,14 +1199,7 @@ Näkymä renderöi \texttt{form}-partialin, jonka sisältö näytettiin
     end
   end
 \end{pygmented}
-\end{myfigure}
-\end{samepage}
 
-\begin{samepage}
-Yksinkertaista \texttt{create}-metodi
-\myref{kuvan}{fig:projects-controller-01-create} mukaiseen muotoon.
-
-\begin{myfigure}[H]
 \caption{\texttt{app/controllers/projects\_controller.rb}:
 \texttt{create}-metodi yksinkertaisempana}
 \label{fig:projects-controller-01-create}
@@ -1237,6 +1218,9 @@ Yksinkertaista \texttt{create}-metodi
 \end{pygmented}
 \end{myfigure}
 \end{samepage}
+
+Yksinkertaista \texttt{create}-metodi
+\myref{kuvan}{fig:projects-controller-01-create} mukaiseen muotoon.
 
 Metodi muodostaa uuden \texttt{Project}-mallin olion täydentäen sen kentät
 käyttäjältä tulevien parametrien perusteella. Olio sijoitetaan
@@ -1282,14 +1266,7 @@ projektin id-numero.
     end
   end
 \end{pygmented}
-\end{myfigure}
-\end{samepage}
 
-\begin{samepage}
-Yksinkertaista \texttt{update}-metodi
-\myref{kuvan}{fig:projects-controller-01-update} mukaiseen muotoon.
-
-\begin{myfigure}[H]
 \caption{\texttt{app/controllers/projects\_controller.rb}:
 \texttt{update}-metodi yksinkertaisempana}
 \label{fig:projects-controller-01-update}
@@ -1308,6 +1285,9 @@ Yksinkertaista \texttt{update}-metodi
 \end{pygmented}
 \end{myfigure}
 \end{samepage}
+
+Yksinkertaista \texttt{update}-metodi
+\myref{kuvan}{fig:projects-controller-01-update} mukaiseen muotoon.
 
 Metodi noutaa tietokannasta polussa olevan id-numeron mukaisen
 \texttt{Project}-mallin olion ja sijoittaa sen
@@ -1351,14 +1331,7 @@ projektin id-numero.
     end
   end
 \end{pygmented}
-\end{myfigure}
-\end{samepage}
 
-\begin{samepage}
-Yksinkertaista \texttt{destroy}-metodi
-\myref{kuvan}{fig:projects-controller-01-destroy} mukaiseen muotoon.
-
-\begin{myfigure}[H]
 \caption{\texttt{app/controllers/projects\_controller.rb}:
 \texttt{destroy}-metodi yksinkertaisempana}
 \label{fig:projects-controller-01-destroy}
@@ -1374,6 +1347,9 @@ Yksinkertaista \texttt{destroy}-metodi
 \end{pygmented}
 \end{myfigure}
 \end{samepage}
+
+Yksinkertaista \texttt{destroy}-metodi
+\myref{kuvan}{fig:projects-controller-01-destroy} mukaiseen muotoon.
 
 Metodi noutaa tietokannasta polussa olevan id-numeron mukaisen
 \texttt{Project}-mallin olion ja sijoittaa sen
