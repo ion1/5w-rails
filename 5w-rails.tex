@@ -1402,12 +1402,17 @@ Tuhoa \texttt{projects.html.erb}-layout. Tuhoa myös
 \texttt{public/stylesheets/scaffold.css}. Tulemme määrittelemään itse kaiken
 ulkoasun.
 
+\begin{pygmented}{console}
+% rm app/views/layouts/projects.html.erb public/stylesheets/scaffold.css
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
 Imuroi lisäksi \texttt{public/javascripts}-hakemistoon jQuery-UJS-projektin
 tiedosto \texttt{rails.js}. Se toteuttaa Railsin JavaScript-toiminnot jQueryn
 kanssa. Yllä oleva \texttt{application.html.erb} viittaa siihen.
 
 \begin{pygmented}{console}
-% rm app/views/layouts/projects.html.erb public/stylesheets/scaffold.css
 % mkdir public/javascripts
 % wget -O public/javascripts/rails.js http://github.com/rails/jquery-ujs/raw/master/src/rails.js
 \end{pygmented}
