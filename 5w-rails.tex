@@ -755,6 +755,7 @@ Kutsu                                    & Palautettu merkkijono                
 \end{samepage}
 
 \subsubsection{\eng{Controller} ja \eng{View}: \texttt{index}}
+\label{sec:projects-controller-00-index}
 
 \begin{samepage}
 \myref{Kuva}{fig:projects-controller-00-index} listaa projects-ohjaimen
@@ -1460,6 +1461,40 @@ testaa ja tulee testaamaan samat asiat.
 \end{pygmented}
 \end{samepage}
 
+\begin{samepage}
+Tee myös \myref{kuvan}{fig:projects-controller-spec-scoped-call} mukainen
+muutos. Haluamme \texttt{projects\_controller}-testin tarkistavan, että
+\texttt{index}-metodi tekee \texttt{Project.all}-kutsun sijaan
+\texttt{Project.scoped}-kutsun
+\myref{kappaleessa}{sec:projects-controller-00-index} tekemämme muutoksen
+mukaisesti.
+
+\begin{myfigure}[H]
+\caption{\texttt{spec/controllers/projects\_controller\_spec.rb}:
+\texttt{Project.scoped}-kutsu \texttt{Project.all}-kutsun sijaan}
+\label{fig:projects-controller-spec-scoped-call}
+
+\begin{pygmented}{diff}
+--- a/spec/controllers/projects_controller_spec.rb
++++ b/spec/controllers/projects_controller_spec.rb
+@@ -8,7 +8,7 @@ describe ProjectsController do
+ 
+   describe "GET index" do
+     it "assigns all projects as @projects" do
+-      Project.stub(:all) { [mock_project] }
++      Project.stub(:scoped) { [mock_project] }
+       get :index
+       assigns(:projects).should eq([mock_project])
+     end
+\end{pygmented}
+
+(Huomaa diff-formaatti. Sanavälillä alkavat rivit ovat tiedostossa jo olevaa
+sisältöä kontekstina. Miinus-merkillä alkavat rivit merkitsevät poistettavia
+rivejä ja plus-merkillä alkavat rivit ovat kyseisiin väleihin lisättäviä
+rivejä.)
+\end{myfigure}
+\end{samepage}
+
 \subsubsection{Cucumber-testien ajo ja commit}
 
 \begin{samepage}
@@ -1499,10 +1534,6 @@ Tee \texttt{features/support/paths.rb}-tiedostoon
        raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
          "Now, go and add a mapping in #{__FILE__}"
 \end{pygmented}
-
-(Huomaa diff-formaatti. Sanavälillä alkavat rivit ovat tiedostossa jo olevaa
-sisältöä kontekstina, plus-merkillä alkavat rivit ovat kyseisiin väleihin
-lisättäviä rivejä.)
 \end{myfigure}
 \end{samepage}
 
