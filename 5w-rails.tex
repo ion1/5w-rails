@@ -1512,6 +1512,8 @@ Voisimme kertoa sille, että polku on \texttt{/projects/new}, mutta on parempi
 käyttää \texttt{new\_project\_path}-metodia, jonka opimme
 \myref{kappaleessa}{sec:projects-routing}.
 
+Lisäämme saman tien muutkin mahdolliset projects-reitit.
+
 \begin{samepage}
 Tee \texttt{features/support/paths.rb}-tiedostoon
 \myref{kuvan}{fig:paths-new-project} mukainen muutos.
@@ -1523,12 +1525,22 @@ Tee \texttt{features/support/paths.rb}-tiedostoon
 \begin{pygmented}{diff}
 --- a/features/support/paths.rb
 +++ b/features/support/paths.rb
-@@ -17,6 +17,9 @@ module NavigationHelpers
+@@ -17,6 +17,19 @@ module NavigationHelpers
      #   when /^(.*)'s profile page$/i
      #     user_profile_path(User.find_by_login($1))
  
++    when 'the Projects page'
++      projects_path
++    when 'a Project page'
++      project_path(Project.first)
++    when /^the Project page for "(.*)"$/
++      project_path(Project.find_by_name($1))
 +    when 'the New Project page'
 +      new_project_path
++    when 'an Edit Project page'
++      edit_project_path(Project.first)
++    when /^the Edit Project page for "(.*)"$/
++      edit_project_path(Project.find_by_name($1))
 +
      else
        raise "Can't find mapping from \"#{page_name}\" to a path.\n" +
