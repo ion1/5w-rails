@@ -8,13 +8,13 @@ Feature: Manage projects
     Given I am on the New Project page
     When I fill in the following:
       | Name | 5w.fi                        |
-      | What | The 5w.fi portal             |
+      | What | The 5w portal                |
       | When | Yesterday                    |
       | Why  | To have an excellent website |
     And I press "Create"
     Then I should see "Project created"
     And I should see "5w.fi"
-    And I should see "The 5w.fi portal"
+    And I should see "The 5w portal"
     And I should see "Yesterday"
     And I should see "To have an excellent website"
     And I should see a timestamp no older than 1 minute
@@ -30,11 +30,11 @@ Feature: Manage projects
     Then I should see "<error>"
 
     Examples:
-      | name | what | when | why | error             |
-      |      | x    | x    | x   | must not be blank |
-      | x    |      | x    | x   | must not be blank |
-      | x    | x    |      | x   | must not be blank |
-      | x    | x    | x    |     | must not be blank |
+      | name | what | when | why | error          |
+      |      | x    | x    | x   | can't be blank |
+      | x    |      | x    | x   | can't be blank |
+      | x    | x    |      | x   | can't be blank |
+      | x    | x    | x    |     | can't be blank |
 
   Scenario: List projects
     Given I am on the New Project page
