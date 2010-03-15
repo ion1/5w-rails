@@ -1550,9 +1550,8 @@ Tee \texttt{features/support/paths.rb}-tiedostoon
 \end{samepage}
 
 \begin{samepage}
-Nyt kun ajamme Rake-komennon \texttt{cucumber:wip}, pääsemme testeissä
-eteenpäin ja Cucumber kertoo ensimmäisen virheilmoituksen muodossa, mitä tulee
-tehdä seuraavaksi.
+Nyt kun ajamme Rake-komennon \texttt{cucumber:wip}, aiemmin epäonnistunut testi
+onnistuu.
 
 \begin{pygmented}{console}
 % rake cucumber:wip
@@ -1567,6 +1566,286 @@ Tee vielä commit projects-scaffoldingista.
 % git commit -m 'Add initial projects scaffolding'
 \end{pygmented}
 \end{samepage}
+
+\subsection{Syötteen validointi}
+
+\begin{samepage}
+Cucumber kertoo ensimmäisen virheilmoituksen muodossa, mitä tulee tehdä
+seuraavaksi.
+
+\begin{pygmented}{console}
+% rake cucumber:wip
+...
+      | name | what | when | why | error          |
+      |      | x    | x    | x   | can't be blank |
+      expected #has_content?("can't be blank") to return true, got false
+      features/manage_projects.feature:30:in `Then I should see "<error>"'
+\end{pygmented}
+\end{samepage}
+
+Käyttäjän syötteen validointi ei tapahtunut speksin määräämällä tavalla:
+virheilmoitusta ''\eng{\dots can't be blank}'' ei tullut, vaikka Name-kenttä
+jätettiin tyhjäksi.
+
+Toteutamme ensin validoinnin testaamisen \texttt{Project}-mallin
+yksikkötesteissä, eli rajapinnan tasolla.
+
+Käytämme Factory Girl
+-kirjastoa\footnote{\url{http://github.com/thoughtbot/factory\_girl\#readme}}
+mallien testiolioiden luomiseen.
+
+\begin{samepage}
+Lisää seuraavat rivit Gemfile-tiedostoon ja aja \texttt{bundle install}, jotta
+kyseinen gem asentuu.
+
+\begin{pygmented}{ruby}
+# Use Factory Girl to generate test objects.
+gem 'factory_girl', :group => :test
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Tee tiedostoon \texttt{config/environment.rb} seuraava muutos, jotta Factory
+Girl on testien käytettävissä.
+
+\begin{pygmented}{diff}
+--- a/config/environment.rb
++++ b/config/environment.rb
+@@ -1,3 +1,5 @@
++require 'factory_girl' if ENV['RAILS_ENV'] == 'test'
++
+ # Load the rails application
+ require File.expand_path('../application', __FILE__)
+ 
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Luo tiedosto \texttt{spec/factories.rb} \myref{kuvan}{fig:factories-00-project}
+mukaisesti.
+
+\begin{myfigure}[H]
+\caption{\texttt{spec/factories.rb}}
+\label{fig:factories-00-project}
+
+\begin{pygmented}{ruby}
+Factory.define :project do |f|
+  f.name '5w.fi'
+  f.what 'The 5w portal'
+  f.when 'Yesterday'
+  f.why  'To have an excellent website'
+end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Tiedosto määrittelee validin \texttt{Project}-mallin olion, joka voidaan
+jatkossa luoda yksikkötesteissä mm. \texttt{Factory.build(:project)}-kutsulla.
+
+\begin{samepage}
+Muokkaa tiedosto \texttt{spec/models/project\_spec.rb}
+\myref{kuvan}{fig:project-model-spec-00} mukaiseksi.
+
+\begin{myfigure}[H]
+\caption{\texttt{spec/models/project\_spec.rb}}
+\label{fig:project-model-spec-00}
+
+\begin{pygmented}{ruby}
+require 'spec_helper'
+
+describe Project do
+  it "should be valid with correct attributes" do
+    project = Factory.build :project
+    project.should be_valid
+  end
+
+  [:name, :what, :when, :why].each do |attribute|
+    it "should not be valid when attribute '#{attribute}' is blank" do
+      project = Factory.build :project, attribute => ''
+
+      project.should_not be_valid
+      project.errors[attribute].should include "can't be blank"
+      project.errors.count.should be 1
+    end
+  end
+end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Aja yksikkötestit Rake-komennolla \texttt{spec}.
+
+\begin{pygmented}{console}
+% rake spec
+................FFFF
+
+1) Project should not be valid when attribute 'name' is blank
+    Failure/Error: project.should_not be_valid
+    expected valid? to return false, got true
+
+2) Project should not be valid when attribute 'what' is blank
+3) Project should not be valid when attribute 'when' is blank
+4) Project should not be valid when attribute 'why' is blank
+\end{pygmented}
+\end{samepage}
+
+Ensimmäiset epäonnistuneet yksikkötestit kertovat, mitä tulee toteuttaa
+seuraavaksi: \texttt{Project}-mallin pitää tarkistaa, että yksikään
+attribuuteista ei ole tyhjä.
+
+\begin{samepage}
+Tee seuraava muutos tiedostoon \texttt{app/models/project.rb}:
+
+\begin{pygmented}{diff}
+--- a/app/models/project.rb
++++ b/app/models/project.rb
+@@ -1,2 +1,3 @@
+ class Project < ActiveRecord::Base
++  validates_presence_of :name, :what, :when, :why
+ end
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Nyt yksikkötestit onnistuvat.
+
+\begin{pygmented}{console}
+% rake spec
+....................
+
+Finished in 0.290829387 seconds
+20 examples, 0 failures
+\end{pygmented}
+
+Kukin piste merkitsee onnistunutta testiä.
+\end{samepage}
+
+\begin{samepage}
+Tee muutoksesta commit.
+
+\begin{pygmented}{console}
+% git status
+  Changed but not updated:
+        modified:   Gemfile
+        modified:   app/models/project.rb
+        modified:   spec/models/project_spec.rb
+        modified:   spec/spec_helper.rb
+  Untracked files:
+        spec/factories.rb
+% git add Gemfile spec/spec_helper.rb spec/factories.rb
+% git commit -m 'Add Factory Girl; define factory for Project'
+
+% git status
+  Changed but not updated:
+        modified:   app/models/project.rb
+        modified:   spec/models/project_spec.rb
+% git commit -a -m 'Project: validate presence of attributes'
+\end{pygmented}
+\end{samepage}
+
+Ajamalla Rake-komennon \texttt{cucumber:wip} näemme, että aiemmin epäonnistunut
+testi onnistuu nyt.
+
+\subsection{Projektin aikaleima}
+
+\begin{samepage}
+Cucumber kertoo jälleen ensimmäisen virheilmoituksen muodossa, mitä tulee tehdä
+seuraavaksi.
+
+\begin{pygmented}{console}
+% rake cucumber:wip
+...
+You can implement step definitions for undefined steps with these snippets:
+
+Then /^I should see a timestamp no older than 1 minute$/ do
+  pending # express the regexp above with the code you wish you had
+end
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Meidän pitää toteuttaa määrittely ''\eng{I should see a timestamp\dots}''
+-testille. Luo \texttt{relative\_time\_steps.rb}-tiedosto
+\myref{kuvan}{fig:relative-time-steps} mukaisesti.
+
+\begin{myfigure}[H]
+\caption{\texttt{features/step\_definitions/relative\_time\_steps.rb}}
+\label{fig:relative-time-steps}
+
+\begin{pygmented}{ruby}
+Then /^I should see a timestamp no (older|newer) than (.*)$/ do |direction, dur|
+  seconds = ChronicDuration.parse dur
+  if seconds.nil?
+    raise ArgumentError, "Invalid duration #{dur.inspect}"
+  end
+
+  timestamps = all(:css, 'abbr.timestamp').map do |node|
+    Time.iso8601(node['title']) rescue nil
+  end.compact
+
+  if direction == 'older'
+    timestamps.should have_a_member be >= Time.now-seconds
+  else
+    timestamps.should have_a_member be <= Time.now+seconds
+  end
+end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Konvertoimme ensin englanninkielisen aikajakson sekunneiksi. Haemme sitten
+web-sivulta kaikki \verb!<abbr class="timestamp">! -elementit, joiden
+\texttt{title}-attribuutti sisältää aikaleiman ISO~8601
+-formaatissa\footnote{\url{http://en.wikipedia.org/wiki/ISO\_8601}}. Lopuksi
+tarkistamme, että vähintään yksi niistä sijoittuu halutulle aikavälille.
+
+\begin{samepage}
+Tarvitsemme ChronicDuration-kirjaston. Lisää seuraavat rivit
+Gemfile-tiedostoon ja aja \texttt{bundle install}, jotta kyseinen gem asentuu.
+
+\begin{pygmented}{ruby}
+# Used by features/step_definitions/relative_time_steps.rb.
+gem 'chronic_duration', :group => :test
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Tarvitsemme myös \texttt{have\_a\_member}-\emph{matcherin}. Imuroi se projektiin.
+
+\begin{pygmented}{console}
+(http://gist.github.com/332500 / raw)
+% wget -O features/support/have_member_matcher.rb \
+> http://gist.github.com/raw/332500/855cda194d345b42d754afe4fc08f8177d2d3e1b/have_a_member_matcher.rb
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Tee muutoksista commit.
+
+\begin{pygmented}{console}
+% git add .
+% git commit -m 'Add relative_time_steps'
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Cucumber kertoo taas, mitä tulee tehdä seuraavaksi.
+
+\begin{pygmented}{console}
+% rake cucumber:wip
+...
+  Scenario: Add a new project                           # features/manage_projects.feature:7
+    Given I am on the New Project page                  # features/step_definitions/web_steps.rb:18
+...
+    And I should see a timestamp no older than 1 minute # features/step_definitions/relative_time_steps.rb:1
+      expected [] to have a member be >= 2010-03-15 06:33:40 +0200
+\end{pygmented}
+\end{samepage}
+
+Testi epäonnistuu, koska sivulta ei löydy aikaleimaa. Lisäämme siis sellaisen näkymään.
+
+TODO
 
 \end{document}
 
