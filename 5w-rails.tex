@@ -1846,9 +1846,331 @@ Cucumber kertoo taas, mitä tulee tehdä seuraavaksi.
 \end{pygmented}
 \end{samepage}
 
-Testi epäonnistuu, koska sivulta ei löydy aikaleimaa. Lisäämme siis sellaisen näkymään.
+\begin{samepage}
+Testi epäonnistuu, koska sivulta ei löydy aikaleimaa. Lisäämme siis sellaisen
+näkymään \myref{kuvan}{fig:projects-view-add-timestamps} mukaisesti.
 
-TODO
+\begin{myfigure}[H]
+\caption{Aikaleiman lisääminen näkymiin}
+\label{fig:projects-view-add-timestamps}
+
+\begin{pygmented}{diff}
+--- a/app/views/projects/index.html.erb
++++ b/app/views/projects/index.html.erb
+@@ -6,6 +6,7 @@
+     <th>What</th>
+     <th>When</th>
+     <th>Why</th>
++    <th>Created on</th>
+     <th></th>
+     <th></th>
+     <th></th>
+@@ -17,6 +18,7 @@
+     <td><%= project.what %></td>
+     <td><%= project.when %></td>
+     <td><%= project.why %></td>
++    <td><%= timestamp project.created_at, '%F' %></td>
+     <td><%= link_to 'Show', project %></td>
+     <td><%= link_to 'Edit', edit_project_path(project) %></td>
+     <td><%= link_to 'Destroy', project, :confirm => 'Are you sure?', :method => :delete %></td>
+\end{pygmented}
+
+\begin{pygmented}{diff}
+--- a/app/views/projects/show.html.erb
++++ b/app/views/projects/show.html.erb
+@@ -18,6 +18,7 @@
+   <%= @project.why %>
+ </p>
+ 
++<p>Created <%= timestamp @project.created_at, 'on %F' %></p>
+ 
+ <%= link_to 'Edit', edit_project_path(@project) %> |
+ <%= link_to 'Back', projects_path %>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Sen sijaan, että loisimme haluamamme \texttt{abbr}-elementin aina manuaalisesti
+tyyliin\dots
+
+\begin{pygmented}{html+erb}
+<abbr class="timestamp" title="<%= project.created_at.iso8601 %>">
+  <%= project.created_at.strftime '%F' %>
+</abbr>
+\end{pygmented}
+
+\dots kutsumme \texttt{timestamp}-\emph{helperiä}, jonka määrittelemme
+seuraavaksi. Helperit ovat yksinkertaisesti tietyssä paikassa määriteltyjä
+metodeja, jotka ovat ohjainten ja näkymien käytettävissä.
+\end{samepage}
+
+\begin{samepage}
+Kirjoitamme ensin yksikkötestit haluamallamme tavalla toimivalle metodille.
+Luo \texttt{application\_helper\_spec.rb}
+\myref{kuvan}{fig:timestamp-helper-spec-00} mukaisesti.
+
+\begin{myfigure}[H]
+\caption{\texttt{spec/helpers/application\_helper\_spec.rb}: Yksikkötestit
+\texttt{timestamp}-helperille}
+\label{fig:timestamp-helper-spec-00}
+
+\begin{pygmented}{ruby}
+require 'rexml/document'
+require 'spec_helper'
+
+describe ApplicationHelper do
+  def helper
+    @helper ||= ApplicationController.helpers
+  end
+
+  describe 'timestamp' do
+    before :all do
+      @time = Time.iso8601 '2010-02-03T04:05:06+07:00'
+    end
+
+    it 'should return an abbr element with correct formatting' do
+      fmt = 'blah %F %T %z blah'
+      doc = REXML::Document.new ERB::Util.h(helper.timestamp(@time, fmt))
+      doc.root.name.should == 'abbr'
+      doc.root.attributes['class'].should == 'timestamp'
+      Time.iso8601(doc.root.attributes['title']).should == @time
+      doc.root.text.should == @time.strftime(fmt)
+    end
+
+    it 'should have a default formatting' do
+      doc = REXML::Document.new ERB::Util.h(helper.timestamp(@time))
+      doc.root.text.should == @time.strftime('%F %T')
+    end
+
+    it 'should escape unsafe format' do
+      fmt = '<%F & %T>'
+      doc = REXML::Document.new ERB::Util.h(helper.timestamp(@time, fmt))
+      doc.root.text.should == @time.strftime(fmt)
+    end
+
+    it 'should pass through safe format' do
+      fmt = '<strong>%F %T</strong>'.html_safe
+      doc = REXML::Document.new ERB::Util.h(helper.timestamp(@time, fmt))
+      doc.root.elements[1].name.should == 'strong'
+      doc.root.elements[1].text.should == @time.strftime('%F %T')
+    end
+  end
+end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Parsetamme kussakin testissä Rubyn standardikirjastoon kuuluvalla
+\texttt{REXML}:llä \texttt{timestamp}-metodin palauttaman merkkijonon.
+
+Testaamme ensin, että elementti on \texttt{abbr} ja että sillä on attribuutti
+\texttt{class="timestamp"} ja ISO~8601 -aikaleiman sisältävä attribuutti
+\texttt{title}. Testaamme myös, että elementti sisältää pyydetyllä tavalla
+muotoillun merkkijonon.
+
+Seuraavassa testissä varmistamme, että jos \texttt{timestamp}-kutsussa ei
+anneta formaattia parametriksi, metodi käyttää vakioarvoa \verb!'%F %t'!.
+
+Kolmannessa testissä varmistamme, että merkit \texttt{<}, \texttt{>} ja
+\texttt{\&} päätyvät HTML:ään \emph{paettuna} oikein.
+
+Lopuksi varmistamme, että \texttt{html\_safe}-metodilla turvalliseksi
+määritellyn merkkijonon vastaavat merkit päätyvät tulosteeseen sellaisenaan.
+
+\begin{samepage}
+Yksikkötestien (\texttt{rake spec}) ensimmäinen virheilmoitus kertoo, että
+metodia \texttt{timestamp} ei ole. Luo sellainen.
+
+\begin{myfigure}[H]
+\begin{pygmented}{diff}
+--- a/app/helpers/application_helper.rb
++++ b/app/helpers/application_helper.rb
+@@ -1,2 +1,6 @@
+ module ApplicationHelper
++  def timestamp time, format
++    content_tag :abbr, time.strftime(format),
++                :class => 'timestamp', :title => time.iso8601
++  end
+ end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Käytämme Railsin \texttt{content\_tag}-helperiä, joka yksinkertaisesti
+muodostaa HTML-elementin halutulla sisällöllä ja halutuilla attribuuteilla.
+
+\texttt{Time}-olion\footnote{\url{http://ruby-doc.org/ruby-1.9/classes/Time.html}}
+\texttt{strftime}-metodi palauttaa halutun formaatin mukaisesti muotoillun
+merkkijonon. \texttt{iso8601}-metodi taas palauttaa ISO~8601 -standardin
+mukaisen merkkijonon.
+
+\begin{samepage}
+Nyt yksikkötestien ensimmäinen epäonnistuminen tapahtuu kohdassa
+''\eng{ApplicationHelper timestamp should have a default formatting}'' ja
+virheilmoitus on ''\eng{wrong number of arguments (1 for 2)}''. Määritä
+\texttt{timestamp}-metodin \texttt{format}-parametrille vakioarvo. \texttt{'\%F
+\%T'} vastaa formaattia \texttt{YYYY-MM-DD HH:MM:SS}.
+
+\begin{myfigure}[H]
+\begin{pygmented}{diff}
+--- a/app/helpers/application_helper.rb
++++ b/app/helpers/application_helper.rb
+@@ -1,5 +1,5 @@
+ module ApplicationHelper
+-  def timestamp time, format
++  def timestamp time, format='%F %T'
+     content_tag :abbr, time.strftime(format),
+                 :class => 'timestamp', :title => time.iso8601
+   end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Nyt yksikkötestien ensimmäinen epäonnistuminen tapahtuu kohdassa
+''\eng{ApplicationHelper timestamp should escape unsafe format}'' ja
+virheilmoitus on ''\eng{REXML::ParseException: malformed XML: missing tag
+start: \dots Last 80 unconsumed characters: \texttt{<2010-02-02 \&
+21:05:06></abbr>>}}''.
+
+\begin{samepage}
+Erikoismerkit selvästi päätyivät tulosteeseen sellaisenaan ja REXML ei kyennyt
+tulkitsemaan epävalidia XML:ää. Muuta metodi suodattamaan
+\texttt{format}-muuttujan arvo \texttt{h}-helperin läpi. Se on \eng{alias}
+\texttt{html\_escape}-helperille, joka \emph{pakenee} epäturvalliset
+merkkijonot.
+
+\begin{myfigure}[H]
+\begin{pygmented}{diff}
+--- a/app/helpers/application_helper.rb
++++ b/app/helpers/application_helper.rb
+@@ -1,6 +1,6 @@
+ module ApplicationHelper
+   def timestamp time, format='%F %T'
+-    content_tag :abbr, time.strftime(format),
++    content_tag :abbr, time.strftime(h(format)),
+                 :class => 'timestamp', :title => time.iso8601
+   end
+ end
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+Nyt yksikään yksikkötesti ei epäonnistu, joten metodi toimii speksimme
+mukaisesti.
+
+\begin{samepage}
+Nyt myös integraatiotestit onnistuvat, joten sovelluksemme toimii speksin
+mukaisesti.
+
+\begin{pygmented}{console}
+% rake cucumber:wip
+...
+6 scenarios (6 passed)
+43 steps (43 passed)
+0m1.079s
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Tee muutoksista commit.
+
+\begin{pygmented}{console}
+% git add .
+% git commit -m 'Add timestamp to views'
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Poista myös @wip-tagi \texttt{Manage Projects} -speksistä.
+
+\begin{myfigure}[H]
+\begin{pygmented}{diff}
+--- a/features/manage_projects.feature
++++ b/features/manage_projects.feature
+@@ -1,4 +1,3 @@
+-@wip
+ Feature: Manage projects
+   In order to manage projects
+   As a user
+\end{pygmented}
+\end{myfigure}
+
+\begin{pygmented}{console}
+% git commit -a -m 'manage_projects.feature: No longer @wip'
+\end{pygmented}
+\end{samepage}
+
+Voit jälleen kokeilla sovellusta ajamalla komennon \texttt{script/rails server}
+ja avaamalla web-sivun \url{http://0.0.0.0/projects}.
+
+\subsubsection{Suhteelliset aikaleimat web-sivulle}
+
+Otamme käyttöön timeago-pluginin\footnote{\url{http://timeago.yarp.com/}}, joka
+muuttaa web-sivulla näkyvät aikaleimat muotoon ''\eng{less than a minute
+ago}'', ''\eng{5 days ago}'' jne.
+
+\begin{samepage}
+Imuroi ensin plugin \texttt{public/javascripts}-hakemistoon.
+
+\begin{pygmented}{console}
+% wget -O public/javascripts/jquery.timeago.js \
+> http://timeago.yarp.com/jquery.timeago.js
+\end{pygmented}
+\end{samepage}
+
+\begin{samepage}
+Luo \texttt{application.js} \myref{kuvan}{fig:application-js-00} mukaisesti.
+
+\begin{myfigure}[H]
+\caption{\texttt{public/javascripts/application.js}}
+\label{fig:application-js-00}
+
+\begin{pygmented}{javascript}
+(function ($) {
+  // Make timestamps relative.
+  $(function () {
+    $('abbr.timestamp').timeago ();
+  });
+}) (jQuery);
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Muokkaa \texttt{application}-layoutia.
+
+\begin{myfigure}[H]
+\begin{pygmented}{diff}
+--- a/app/views/layouts/application.html.erb
++++ b/app/views/layouts/application.html.erb
+@@ -3,7 +3,10 @@
+ <head>
+   <title><%= controller.action_name %> &ndash; <%= controller.controller_name %> &ndash; 5w</title>
+   <%= javascript_include_tag 'http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js' %>
+-  <%= javascript_include_tag 'rails', :cache => true %>
++  <%= javascript_include_tag 'rails',
++                             'jquery.timeago',
++                             'application',
++                             :cache => true %>
+   <%= csrf_meta_tag %>
+ </head>
+ <body>
+\end{pygmented}
+\end{myfigure}
+\end{samepage}
+
+\begin{samepage}
+Tee muutoksista commit.
+
+\begin{pygmented}{console}
+% git add .
+% git commit -m 'Make timestamps relative using timeago'
+\end{pygmented}
+\end{samepage}
+
+Voit jälleen kokeilla sovellusta ajamalla komennon \texttt{script/rails server}
+ja avaamalla web-sivun \url{http://0.0.0.0/projects}.
 
 \end{document}
 
